@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | NeoLearn - AI-Powered Learning Platform</title>
+    <title>Login - NeoLearn Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,11 +12,19 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #2d3748;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            background: var(--navy-deep);
+            color: var(--cream);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -25,130 +34,139 @@
             overflow: hidden;
         }
 
-        /* Background Elements */
-        body::before {
-            content: '';
-            position: absolute;
+        .background-pattern {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.1;
-        }
-
-        /* Floating Shapes */
-        .floating-shape {
-            position: absolute;
-            opacity: 0.1;
-            pointer-events: none;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .floating-shape:nth-child(1) {
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .floating-shape:nth-child(2) {
-            top: 60%;
-            right: 15%;
-            animation-delay: 2s;
-        }
-
-        .floating-shape:nth-child(3) {
-            bottom: 20%;
-            left: 20%;
-            animation-delay: 4s;
-        }
-
-        .floating-shape:nth-child(4) {
-            top: 30%;
-            right: 30%;
-            animation-delay: 3s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 50px 40px;
             width: 100%;
-            max-width: 420px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            height: 100%;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, var(--gold-primary) 35px, var(--gold-primary) 36px);
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float-particle 15s infinite ease-in-out;
+        }
+
+        @keyframes float-particle {
+            0%, 100% { transform: translateY(100vh); opacity: 0; }
+            10%, 90% { opacity: 0.3; }
+            50% { transform: translateY(-10vh); }
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 30%; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 50%; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 70%; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 90%; animation-delay: 3s; }
+
+        .login-card {
             position: relative;
             z-index: 10;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: slideIn 0.8s ease-out;
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(135deg, rgba(42, 74, 107, 0.6), rgba(26, 50, 80, 0.4));
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(200, 160, 98, 0.2);
+            animation: slideIn 0.6s ease-out;
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(50px) scale(0.95);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
-        .logo {
+        .logo-section {
             text-align: center;
             margin-bottom: 2rem;
         }
 
-        .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .logo-svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 5px 15px rgba(200, 160, 98, 0.3));
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-20px); }
+            100% { transform: translateX(100px); }
+        }
+
+        .left-bar, .right-bar {
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .shine-effect {
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        .logo-text h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
-        .logo p {
-            color: #718096;
-            font-size: 1rem;
-            font-weight: 500;
+        .logo-text p {
+            color: rgba(250, 247, 240, 0.6);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
         }
 
         .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .login-header h2 {
-            font-size: 1.8rem;
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
+            color: var(--cream);
+            margin-bottom: 0.3rem;
         }
 
         .login-header p {
-            color: #718096;
-            font-size: 0.95rem;
+            color: rgba(250, 247, 240, 0.6);
+            font-size: 0.85rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
-            position: relative;
+            margin-bottom: 1.2rem;
         }
 
         .form-group label {
             display: block;
             font-weight: 600;
-            color: #4a5568;
+            color: var(--gold-light);
             margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            font-size: 0.85rem;
         }
 
         .input-wrapper {
@@ -157,96 +175,85 @@
 
         .input-icon {
             position: absolute;
-            left: 15px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.1rem;
-            color: #718096;
+            font-size: 1rem;
+            color: rgba(250, 247, 240, 0.5);
             transition: all 0.3s ease;
-            z-index: 2;
         }
 
         .form-control {
             width: 100%;
-            padding: 16px 20px 16px 50px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.8);
+            padding: 12px 16px 12px 45px;
+            border: 2px solid rgba(200, 160, 98, 0.3);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: rgba(26, 50, 80, 0.4);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            color: #2d3748;
+            color: var(--cream);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control::placeholder {
+            color: rgba(250, 247, 240, 0.4);
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            background: white;
-            transform: translateY(-2px);
+            border-color: var(--gold-primary);
+            background: rgba(26, 50, 80, 0.6);
+            box-shadow: 0 0 0 3px rgba(200, 160, 98, 0.15);
         }
 
         .form-control:focus + .input-icon {
-            color: #667eea;
-            transform: translateY(-50%) scale(1.1);
+            color: var(--gold-primary);
         }
 
-        .form-control:hover {
-            border-color: #cbd5e0;
-            transform: translateY(-1px);
-        }
-
-        .btn {
+        .btn-submit {
             width: 100%;
-            padding: 16px 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--navy-deep);
             border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
             position: relative;
             overflow: hidden;
-            margin-top: 1rem;
         }
 
-        .btn::before {
+        .btn-submit::before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.5s ease;
         }
 
-        .btn:hover::before {
+        .btn-submit:hover::before {
             left: 100%;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: 2px solid transparent;
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(200, 160, 98, 0.6);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-            filter: brightness(1.1);
-        }
-
-        .btn-primary:active {
-            transform: translateY(-1px);
-        }
-
-        /* Loading State */
-        .btn-loading {
+        .btn-submit.loading {
             color: transparent;
+            pointer-events: none;
         }
 
-        .btn-loading::after {
+        .btn-submit.loading::after {
             content: '';
             position: absolute;
             top: 50%;
@@ -254,289 +261,110 @@
             transform: translate(-50%, -50%);
             width: 20px;
             height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top: 2px solid white;
+            border: 2px solid rgba(11, 29, 53, 0.3);
+            border-top-color: var(--navy-deep);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        .register-link {
+        .back-link {
             text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            margin-top: 1.5rem;
         }
 
-        .register-link p {
-            color: #718096;
-            font-size: 0.95rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .register-link a {
+        .back-link a {
+            color: var(--gold-light);
             text-decoration: none;
-            color: #667eea;
-            font-weight: 600;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
-            position: relative;
         }
 
-        .register-link a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -2px;
-            left: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
+        .back-link a:hover {
+            color: var(--gold-primary);
         }
 
-        .register-link a:hover {
-            color: #764ba2;
-            transform: translateY(-1px);
-        }
-
-        .register-link a:hover::after {
-            width: 100%;
-        }
-
-        /* Error Messages */
-        .error-messages {
-            background: rgba(254, 226, 226, 0.9);
-            border: 1px solid #feb2b2;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        .error-messages ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .error-messages li {
-            color: #c53030;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .error-messages li::before {
-            content: '⚠️';
-            font-size: 1rem;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        /* Success Messages */
-        .success-messages {
-            background: rgba(220, 252, 231, 0.9);
-            border: 1px solid #9ae6b4;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            animation: slideDown 0.5s ease-out;
-        }
-
-        .success-messages li {
-            color: #22543d;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .success-messages li::before {
-            content: '✅';
-            font-size: 1rem;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Input Validation Styles */
-        .form-control.invalid {
-            border-color: #e53e3e;
-            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
-        }
-
-        .form-control.valid {
-            border-color: #38a169;
-            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
-        }
-
-        /* Remember Me Checkbox */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin: 1rem 0;
-        }
-
-        .checkbox-wrapper {
-            position: relative;
-        }
-
-        .checkbox-wrapper input[type="checkbox"] {
-            opacity: 0;
-            position: absolute;
-        }
-
-        .checkbox-custom {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #cbd5e0;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .checkbox-wrapper input[type="checkbox"]:checked + .checkbox-custom {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-color: #667eea;
-        }
-
-        .checkbox-custom::after {
-            content: '✓';
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.2s ease;
-        }
-
-        .checkbox-wrapper input[type="checkbox"]:checked + .checkbox-custom::after {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .checkbox-label {
-            font-size: 0.9rem;
-            color: #4a5568;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .login-container {
-                padding: 40px 30px;
-                margin: 20px;
-                border-radius: 20px;
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.5rem;
             }
 
-            .logo h1 {
-                font-size: 2rem;
+            .logo-svg {
+                width: 70px;
+                height: 70px;
             }
 
-            .login-header h2 {
+            .logo-text h1 {
                 font-size: 1.5rem;
             }
-
-            .form-control {
-                padding: 14px 18px 14px 45px;
-            }
-
-            .btn {
-                padding: 14px 20px;
-            }
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(241, 241, 241, 0.1);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <!-- Floating Background Elements -->
-    <div class="floating-shape">
-        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="40" fill="white" opacity="0.1"/>
-        </svg>
-    </div>
-    <div class="floating-shape">
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect x="20" y="20" width="40" height="40" fill="white" opacity="0.1" rx="8"/>
-        </svg>
-    </div>
-    <div class="floating-shape">
-        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-            <polygon points="60,20 80,70 40,70" fill="white" opacity="0.1"/>
-        </svg>
-    </div>
-    <div class="floating-shape">
-        <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
-            <path d="M45 10 L70 35 L45 60 L20 35 Z" fill="white" opacity="0.1"/>
-        </svg>
-    </div>
+    <div class="background-pattern"></div>
+    
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
 
-    <div class="login-container">
-        <div class="logo">
-            <h1>NeoLearn</h1>
-            <p>AI-Powered Learning Platform</p>
+    <div class="login-card">
+        <div class="logo-section">
+            <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#C8A062"/>
+                        <stop offset="50%" stop-color="#E6D5B8"/>
+                        <stop offset="100%" stop-color="#9B7E4F"/>
+                    </linearGradient>
+                    <linearGradient id="shineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="white" stop-opacity="0"/>
+                        <stop offset="50%" stop-color="white" stop-opacity="0.8"/>
+                        <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+
+                <rect class="left-bar" x="45" y="50" width="22" height="100" rx="11" fill="url(#mainGradient)"/>
+                <rect class="right-bar" x="133" y="50" width="22" height="100" rx="11" fill="url(#mainGradient)"/>
+                <path d="M67 50 L133 150 L133 130 L85 60 Z" fill="url(#mainGradient)"/>
+
+                <circle cx="56" cy="65" r="4" fill="#E6D5B8"/>
+                <circle cx="100" cy="100" r="4" fill="#C8A062"/>
+                <circle cx="144" cy="135" r="4" fill="#E6D5B8"/>
+
+                <line x1="56" y1="65" x2="100" y2="100" stroke="white" stroke-width="1.5" opacity="0.3"/>
+                <line x1="100" y1="100" x2="144" y2="135" stroke="white" stroke-width="1.5" opacity="0.3"/>
+
+                <rect class="shine-effect" x="-20" y="40" width="30" height="120" fill="url(#shineGradient)" opacity="0.5"/>
+            </svg>
+
+            <div class="logo-text">
+                <h1>NeoLearn</h1>
+                <p>Digital Portal</p>
+            </div>
         </div>
 
         <div class="login-header">
-            <!-- <h2>Welcome Back! 👋</h2> -->
-            <p>Sign in to your account to continue learning</p>
+            <h2>Login to Continue</h2>
+            <p>Enter your credentials</p>
         </div>
-
-        <!-- Error Messages -->
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="error-messages">
-                    <ul>
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        {% endwith %}
 
         <form method="post" id="loginForm">
             <div class="form-group">
                 <label for="username">Username</label>
                 <div class="input-wrapper">
-                    <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username" required>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        id="username" 
+                        class="form-control" 
+                        placeholder="Your username" 
+                        required
+                    >
                     <div class="input-icon">👤</div>
                 </div>
             </div>
@@ -544,106 +372,64 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-wrapper">
-                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
-                    <div class="input-icon">🔒</div>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        class="form-control" 
+                        placeholder="Your password" 
+                        required
+                    >
+                    <div class="input-icon" id="passwordIcon">🔒</div>
                 </div>
             </div>
 
-            <!-- <div class="checkbox-group">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="remember" name="remember">
-                    <div class="checkbox-custom"></div>
-                </div>
-                < <label for="remember" class="checkbox-label">Remember me for 30 days</label> -->
-            <!-- </div>  -->
-
-            <button type="submit" class="btn btn-primary" id="loginBtn">
-                🚀 Sign In to NeoLearn
+            <button type="submit" class="btn-submit" id="loginBtn">
+                Access Account →
             </button>
         </form>
 
-        <!-- <div class="register-link">
-            <! <p>Don't have an account yet?</p> -->
-            <!-- <a href="{{ url_for('admin_register') }}">Create Account →</a> -->
-            <!-- <a href="#" onclick="alert('Registration is currently disabled. Please contact your administrator.')">Create Account →</a>
+        <div class="back-link">
+            <a href="/">← Back to Home</a>
         </div>
-    </div>  -->
+    </div>
 
     <script>
-        // Form submission animation
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const loginBtn = document.getElementById('loginBtn');
-            loginBtn.classList.add('btn-loading');
-            loginBtn.textContent = 'Signing In...';
+        const passwordIcon = document.getElementById('passwordIcon');
+        const passwordInput = document.getElementById('password');
+
+        passwordIcon.style.cursor = 'pointer';
+        passwordIcon.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.textContent = '👁️';
+            } else {
+                passwordInput.type = 'password';
+                this.textContent = '🔒';
+            }
         });
 
-        // Input validation and animation
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+
+        loginForm.addEventListener('submit', function(e) {
+            loginBtn.classList.add('loading');
+        });
+
         document.querySelectorAll('.form-control').forEach(input => {
             input.addEventListener('focus', function() {
-                this.parentElement.parentElement.querySelector('label').style.color = '#667eea';
-                this.parentElement.parentElement.querySelector('label').style.transform = 'translateY(-2px)';
+                const label = this.closest('.form-group').querySelector('label');
+                label.style.color = 'var(--gold-primary)';
             });
 
             input.addEventListener('blur', function() {
-                this.parentElement.parentElement.querySelector('label').style.color = '#4a5568';
-                this.parentElement.parentElement.querySelector('label').style.transform = 'translateY(0)';
-                
-                // Basic validation
-                if (this.value.length > 0) {
-                    this.classList.add('valid');
-                    this.classList.remove('invalid');
-                } else if (this.hasAttribute('required')) {
-                    this.classList.add('invalid');
-                    this.classList.remove('valid');
-                }
-            });
-
-            // Real-time validation
-            input.addEventListener('input', function() {
-                if (this.value.length > 0) {
-                    this.classList.remove('invalid');
-                }
+                const label = this.closest('.form-group').querySelector('label');
+                label.style.color = 'var(--gold-light)';
             });
         });
 
-        // Password visibility toggle (optional enhancement)
-        function addPasswordToggle() {
-            const passwordInput = document.getElementById('password');
-            const passwordIcon = passwordInput.nextElementSibling;
-            
-            passwordIcon.style.cursor = 'pointer';
-            passwordIcon.addEventListener('click', function() {
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    this.textContent = '👁️';
-                } else {
-                    passwordInput.type = 'password';
-                    this.textContent = '🔒';
-                }
-            });
-        }
-
-        // Initialize password toggle
-        // addPasswordToggle();
-
-        // Smooth animations on load
         window.addEventListener('load', () => {
-            document.querySelector('.login-container').style.animation = 'slideIn 0.8s ease-out';
-        });
-
-        // Keyboard navigation enhancement
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.activeElement.tagName !== 'BUTTON') {
-                const form = document.getElementById('loginForm');
-                const inputs = form.querySelectorAll('input[required]');
-                const currentIndex = Array.from(inputs).indexOf(document.activeElement);
-                
-                if (currentIndex < inputs.length - 1) {
-                    inputs[currentIndex + 1].focus();
-                } else {
-                    document.getElementById('loginBtn').click();
-                }
-            }
+            setTimeout(() => document.getElementById('username').focus(), 300);
         });
     </script>
 </body>

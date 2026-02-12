@@ -1,0 +1,123 @@
+CREATE TABLE IF NOT EXISTS ai_chat_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) NOT NULL,
+  role ENUM('user','assistant') NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ai_documents (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  content LONGTEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE feedback (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_name VARCHAR(100),
+  rating INT,
+  comment TEXT
+);
+USE classroom_db;
+
+CREATE TABLE vote_options (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) DEFAULT NULL,
+    option VARCHAR(255) DEFAULT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+USE classroom_db;
+
+CREATE TABLE votes (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) DEFAULT NULL,
+    option_text VARCHAR(255) DEFAULT NULL,
+    votes INT(11) DEFAULT 0,
+    active TINYINT(1) DEFAULT 1,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+USE classroom_db;
+
+CREATE TABLE quiz_scores (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) DEFAULT NULL,
+    standard VARCHAR(50) DEFAULT NULL,
+    subject VARCHAR(100) DEFAULT NULL,
+    score INT(11) DEFAULT NULL,
+    total INT(11) DEFAULT NULL,
+    taken_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+USE classroom_db;
+
+CREATE TABLE student_votes (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    username VARCHAR(100) DEFAULT NULL,
+    vote_title VARCHAR(255) DEFAULT NULL,
+    voted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    option_id INT(11) DEFAULT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+USE classroom_db;
+
+CREATE TABLE quizzes (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    question TEXT DEFAULT NULL,
+    option1 VARCHAR(255) DEFAULT NULL,
+    option2 VARCHAR(255) DEFAULT NULL,
+    option3 VARCHAR(255) DEFAULT NULL,
+    option4 VARCHAR(255) DEFAULT NULL,
+    answer VARCHAR(255) DEFAULT NULL,
+    standard VARCHAR(50) DEFAULT NULL,
+    subject VARCHAR(100) DEFAULT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+USE classroom_db;
+
+CREATE TABLE messages (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    content TEXT NOT NULL,
+    recipient ENUM('student', 'teacher', 'all') NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+USE classroom_db;
+
+CREATE TABLE materials (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    standard VARCHAR(50) DEFAULT NULL,
+    subject VARCHAR(100) DEFAULT NULL,
+    title VARCHAR(255) DEFAULT NULL,
+    filename VARCHAR(255) DEFAULT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS classroom_db;
+USE classroom_db;
+
+CREATE TABLE users (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('student', 'teacher') NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+ 
+ALTER TABLE users
+ADD COLUMN photo VARCHAR(255) NULL;
+
+ALTER TABLE users
+ADD COLUMN email VARCHAR(100),
+ADD COLUMN mobile VARCHAR(15),
+ADD COLUMN dob DATE;
+
+CREATE TABLE student_teacher_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    teacher_id INT NOT NULL,
+    message TEXT NOT NULL,
+    sender ENUM('student','teacher') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE messages
+MODIFY recipient VARCHAR(50) NOT NULL;

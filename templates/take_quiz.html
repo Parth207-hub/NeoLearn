@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Take Quiz</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -10,325 +10,399 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --navy-deep: #0B1D35;
+      --navy-rich: #1A3250;
+      --navy-medium: #2A4A6B;
+      --gold-primary: #C8A062;
+      --gold-light: #E6D5B8;
+      --gold-dark: #9B7E4F;
+      --cream: #FAF7F0;
+      --cream-dark: #F0EAE0;
+      --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+      --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+      --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+      --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+    }
+
+    /* ─── Body ─── */
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-      line-height: 1.6;
-      color: #2d3748;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+      background-attachment: fixed;
+      color: var(--navy-deep);
       min-height: 100vh;
+      padding: 40px 20px;
+      position: relative;
       overflow-x: hidden;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    /* Quiz Container */
-    .quiz-container {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-      margin: 50px auto;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    /* Title Styling */
-    h2 {
-      font-size: 2.5rem !important;
-      font-weight: 800 !important;
-      color: #2d3748 !important;
-      margin-bottom: 2rem !important;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-align: center;
-    }
-
-    /* Form Controls */
-    .form-control {
-      border: 2px solid rgba(102, 126, 234, 0.2) !important;
-      border-radius: 12px !important;
-      padding: 12px 16px !important;
-      font-size: 1rem !important;
-      transition: all 0.3s ease !important;
-      background: rgba(255, 255, 255, 0.9) !important;
-    }
-
-    .form-control:focus {
-      border-color: #667eea !important;
-      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.2) !important;
-      background: white !important;
-    }
-
-    .form-control::placeholder {
-      color: #a0aec0;
-    }
-
-    /* Button Styling */
-    .btn {
-      padding: 12px 24px !important;
-      border-radius: 50px !important;
-      font-weight: 600 !important;
-      text-decoration: none !important;
-      transition: all 0.3s ease !important;
-      border: 2px solid transparent !important;
-      font-size: 1rem !important;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea, #764ba2) !important;
-      color: white !important;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px) !important;
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4) !important;
-      filter: brightness(1.1) !important;
-      color: white !important;
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #48bb78, #38a169) !important;
-      color: white !important;
-      border: 2px solid transparent !important;
-    }
-
-    .btn-success:hover {
-      transform: translateY(-2px) !important;
-      box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4) !important;
-      filter: brightness(1.1) !important;
-      color: white !important;
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.9) !important;
-      color: #667eea !important;
-      border: 2px solid #667eea !important;
-    }
-
-    .btn-secondary:hover {
-      background: #667eea !important;
-      color: white !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3) !important;
-    }
-
-    /* Question Cards */
-    .question-card {
-      background: white;
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 25px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(102, 126, 234, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .question-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-      border-color: rgba(102, 126, 234, 0.2);
-    }
-
-    .question-card strong {
-      color: #2d3748;
-      font-size: 1.1rem;
-      font-weight: 700;
-      display: block;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid rgba(102, 126, 234, 0.1);
-    }
-
-    /* Radio Button Styling */
-    .form-check {
-      padding: 10px 15px !important;
-      margin: 8px 0 !important;
-      border-radius: 10px;
-      background: rgba(102, 126, 234, 0.02);
-      transition: all 0.3s ease;
-      border: 1px solid transparent;
-    }
-
-    .form-check:hover {
-      background: rgba(102, 126, 234, 0.05);
-      border-color: rgba(102, 126, 234, 0.2);
-    }
-
-    .form-check-input:checked {
-      background-color: #667eea !important;
-      border-color: #667eea !important;
-    }
-
-    .form-check-input:checked + .form-check-label {
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    .form-check-input {
-      margin-top: 0.2rem !important;
-    }
-
-    .form-check-label {
-      color: #4a5568;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-
-    /* Form Sections */
-    .form-section {
-      background: white;
-      border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(102, 126, 234, 0.1);
-    }
-
-    /* Floating Elements */
-    .floating-shape {
-      position: absolute;
-      opacity: 0.08;
+    /* Ambient radial glows */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
       pointer-events: none;
-      animation: float 6s ease-in-out infinite;
+      z-index: 0;
     }
 
-    .floating-shape:nth-child(1) {
-      top: 15%;
-      left: 8%;
-      animation-delay: 0s;
+    /* ─── Container ─── */
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
-    .floating-shape:nth-child(2) {
-      top: 50%;
-      right: 10%;
-      animation-delay: 2s;
+    /* ─── Quiz Container ─── */
+    .quiz-container {
+      background: rgba(250, 247, 240, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 36px 32px 32px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(200, 160, 98, 0.12);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .floating-shape:nth-child(3) {
-      bottom: 15%;
-      left: 15%;
-      animation-delay: 4s;
+    /* Gold shimmer bar */
+    .quiz-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
     }
 
-    @keyframes float {
-      0%, 100% { 
-        transform: translateY(0px) rotate(0deg); 
-      }
-      50% { 
-        transform: translateY(-15px) rotate(3deg); 
-      }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position:  200% 0; }
     }
 
-    /* Progress Indicator */
-    .quiz-progress {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      height: 4px;
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Quiz Header ─── */
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .title-accent {
+      width: 4px;
+      height: 28px;
+      background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
       border-radius: 2px;
-      margin-bottom: 30px;
+      flex-shrink: 0;
+    }
+
+    .quiz-header h2 {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--navy-deep);
+      margin: 0;
+    }
+
+    /* ─── Progress Bar ─── */
+    .quiz-progress {
+      height: 3px;
+      border-radius: 2px;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
       animation: pulse 2s infinite;
     }
 
-    /* Responsive Design */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.7; }
+    }
+
+    /* ─── Form Section ─── */
+    .form-section {
+      background: rgba(250, 247, 240, 0.6);
+      border: 1px solid rgba(200, 160, 98, 0.18);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ─── Form Controls ─── */
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(200, 160, 98, 0.25);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      background: rgba(250, 247, 240, 0.5);
+      color: var(--navy-deep);
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 14px;
+    }
+
+    .form-control::placeholder {
+      color: rgba(11, 29, 53, 0.4);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--gold-primary);
+      background: rgba(250, 247, 240, 0.9);
+      box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.12);
+    }
+
+    .form-control:read-only {
+      background: rgba(200, 160, 98, 0.08);
+      border-color: rgba(200, 160, 98, 0.2);
+      cursor: not-allowed;
+    }
+
+    /* Select dropdown styling */
+    select.form-control {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239B7E4F' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 14px center;
+      background-repeat: no-repeat;
+      background-size: 1.2rem;
+      padding-right: 42px;
+    }
+
+    /* ─── Question Cards ─── */
+    .question-card {
+      background: rgba(250, 247, 240, 0.6);
+      border: 1px solid rgba(200, 160, 98, 0.18);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Left gold accent bar on each question */
+    .question-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+    }
+
+    .question-card:hover {
+      border-color: rgba(200, 160, 98, 0.35);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .question-card strong {
+      font-family: 'Crimson Pro', serif;
+      color: var(--navy-deep);
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(200, 160, 98, 0.15);
+    }
+
+    /* ─── Radio Button Options ─── */
+    .form-check {
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 10px;
+      background: rgba(250, 247, 240, 0.5);
+      border: 1px solid rgba(200, 160, 98, 0.15);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .form-check:hover {
+      background: rgba(250, 247, 240, 0.85);
+      border-color: rgba(200, 160, 98, 0.3);
+    }
+
+    /* Selected state */
+    .form-check.selected {
+      background: rgba(200, 160, 98, 0.12);
+      border-color: var(--gold-primary);
+      border-left-width: 2px;
+    }
+
+    .form-check-input {
+      margin-right: 12px;
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--gold-primary);
+      cursor: pointer;
+    }
+
+    .form-check-input:checked + .form-check-label {
+      color: var(--navy-deep);
+      font-weight: 600;
+    }
+
+    .form-check-label {
+      color: rgba(11, 29, 53, 0.85);
+      font-size: 0.9rem;
+      cursor: pointer;
+      flex: 1;
+      transition: color 0.3s ease;
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Ripple */
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      color: white;
+      box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #27ae60, #1e8449);
+      color: white;
+      box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(250, 247, 240, 0.9);
+      color: var(--navy-medium);
+      border: 2px solid rgba(200, 160, 98, 0.4);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background: var(--cream-dark);
+      border-color: var(--gold-primary);
+      color: var(--navy-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(200, 160, 98, 0.25);
+    }
+
+    /* Button spacing */
+    .my-2 {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
+    .mt-3 {
+      margin-top: 16px;
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar         { width: 6px; }
+    ::-webkit-scrollbar-track   { background: rgba(250, 247, 240, 0.3); }
+    ::-webkit-scrollbar-thumb   { background: rgba(200, 160, 98, 0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(200, 160, 98, 0.5); }
+
+    /* ─── Responsive ─── */
     @media (max-width: 768px) {
-      .quiz-container {
-        margin: 20px 10px;
-        padding: 25px 20px;
-      }
+      body { padding: 24px 12px; }
 
-      h2 {
-        font-size: 2rem !important;
-      }
+      .quiz-container { padding: 28px 18px 24px; }
 
-      .question-card {
-        padding: 20px;
-      }
+      .quiz-header h2 { font-size: 1.35rem; }
+
+      .question-card { padding: 20px; }
 
       .btn {
         width: 100%;
-        margin-bottom: 10px !important;
-      }
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border-radius: 4px;
-    }
-
-    /* Animation for form elements */
-    .fade-in {
-      animation: fadeIn 0.6s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+        margin-bottom: 10px;
       }
     }
   </style>
 </head>
-<body class="p-4">
-  <!-- Floating Elements -->
-  <div class="floating-shape">
-    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-      <circle cx="50" cy="50" r="40" fill="white" opacity="0.1"/>
-    </svg>
-  </div>
-  <div class="floating-shape">
-    <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-      <rect x="20" y="20" width="40" height="40" fill="white" opacity="0.1" rx="8"/>
-    </svg>
-  </div>
-  <div class="floating-shape">
-    <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-      <polygon points="60,20 80,70 40,70" fill="white" opacity="0.1"/>
-    </svg>
-  </div>
+<body>
 
   <div class="container">
-    <div class="quiz-container fade-in">
-      <h2>📝 Take Quiz</h2>
+    <div class="quiz-container">
 
+      <!-- Header -->
+      <div class="quiz-header">
+        <div class="title-accent"></div>
+        <h2>📝 Take Quiz</h2>
+      </div>
+
+      <!-- Start Quiz Form (shown if no questions yet) -->
       {% if not questions %}
-<div class="form-section">
-  <div class="quiz-progress"></div>
-  <form method="post">
-    <input type="text" name="name" placeholder="Your Name" class="form-control my-2" required>
+      <div class="form-section">
+        <div class="quiz-progress"></div>
+        <form method="post">
+          <input type="text" name="name" placeholder="Your Name" class="form-control" required>
+          <input type="text" value="Standard: {{ standard }}" class="form-control" readonly>
+          <select name="subject" class="form-control" required>
+            <option value="">Select Subject</option>
+            {% for s in subjects %}
+            <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-primary">🚀 Start Quiz</button>
+        </form>
+      </div>
+      {% endif %}
 
-    <input type="text" value="Standard: {{ standard }}" class="form-control my-2" readonly>
-
-    <select name="subject" class="form-control my-2" required>
-      <option value="">Select Subject</option>
-      {% for s in subjects %}
-      <option value="{{ s }}">{{ s }}</option>
-      {% endfor %}
-    </select>
-
-    <button class="btn btn-primary">🚀 Start Quiz</button>
-  </form>
-</div>
-{% endif %}
-
-
+      <!-- Quiz Questions Form -->
       {% if questions %}
       <form method="post" action="/submit-quiz">
         <input type="hidden" name="name" value="{{ name }}">
@@ -339,61 +413,63 @@
         <div class="question-card">
           <strong>Q{{ loop.index }}. {{ q[1] }}</strong>
           <div class="form-check">
-            <input type="radio" name="{{ q[0] }}" value="A" class="form-check-input" required>
-            <label class="form-check-label">{{ q[2] }}</label>
+            <input type="radio" name="{{ q[0] }}" value="A" class="form-check-input" id="q{{ q[0] }}_A" required>
+            <label class="form-check-label" for="q{{ q[0] }}_A">{{ q[2] }}</label>
           </div>
           <div class="form-check">
-            <input type="radio" name="{{ q[0] }}" value="B" class="form-check-input">
-            <label class="form-check-label">{{ q[3] }}</label>
+            <input type="radio" name="{{ q[0] }}" value="B" class="form-check-input" id="q{{ q[0] }}_B">
+            <label class="form-check-label" for="q{{ q[0] }}_B">{{ q[3] }}</label>
           </div>
           <div class="form-check">
-            <input type="radio" name="{{ q[0] }}" value="C" class="form-check-input">
-            <label class="form-check-label">{{ q[4] }}</label>
+            <input type="radio" name="{{ q[0] }}" value="C" class="form-check-input" id="q{{ q[0] }}_C">
+            <label class="form-check-label" for="q{{ q[0] }}_C">{{ q[4] }}</label>
           </div>
           <div class="form-check">
-            <input type="radio" name="{{ q[0] }}" value="D" class="form-check-input">
-            <label class="form-check-label">{{ q[5] }}</label>
+            <input type="radio" name="{{ q[0] }}" value="D" class="form-check-input" id="q{{ q[0] }}_D">
+            <label class="form-check-label" for="q{{ q[0] }}_D">{{ q[5] }}</label>
           </div>
         </div>
         {% endfor %}
+        
         <button class="btn btn-success">✅ Submit Quiz</button>
       </form>
       {% endif %}
 
-      <a href="/student" class="btn btn-secondary mt-3">🔙 Back</a>
+      <!-- Back Button -->
+      <a href="/student" class="btn btn-secondary mt-3">📙 Back</a>
+
     </div>
   </div>
 
   <script>
-    // Add entrance animations
     document.addEventListener('DOMContentLoaded', () => {
+      // Staggered entrance for question cards
       const cards = document.querySelectorAll('.question-card');
       cards.forEach((card, index) => {
         card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        card.style.transform = 'translateY(16px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         
         setTimeout(() => {
           card.style.opacity = '1';
           card.style.transform = 'translateY(0)';
-        }, 100 + (index * 100));
+        }, 80 + (index * 90));
       });
 
-      // Add smooth animations for radio button selections
+      // Radio button selection styling
       const radioInputs = document.querySelectorAll('.form-check-input');
       radioInputs.forEach(input => {
         input.addEventListener('change', function() {
           // Remove selection styling from siblings
-          const siblingChecks = this.closest('.question-card').querySelectorAll('.form-check');
+          const questionCard = this.closest('.question-card');
+          const siblingChecks = questionCard.querySelectorAll('.form-check');
           siblingChecks.forEach(check => {
-            check.style.background = 'rgba(102, 126, 234, 0.02)';
-            check.style.borderColor = 'transparent';
+            check.classList.remove('selected');
           });
           
           // Add selection styling to current
           if (this.checked) {
-            this.closest('.form-check').style.background = 'rgba(102, 126, 234, 0.1)';
-            this.closest('.form-check').style.borderColor = 'rgba(102, 126, 234, 0.3)';
+            this.closest('.form-check').classList.add('selected');
           }
         });
       });

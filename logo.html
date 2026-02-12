@@ -1,0 +1,297 @@
+Logo updated · HTML
+Copy
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NeoLearn - Loading</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, #C8A062 35px, #C8A062 36px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, #C8A062 35px, #C8A062 36px);
+        }
+
+        /* Animated Gradient Orbs */
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.2;
+            animation: float-orb 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #C8A062, transparent);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #4A7BA7, transparent);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: 5s;
+        }
+
+        @keyframes float-orb {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        .logo-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .logo-svg {
+            width: 160px;
+            height: 160px;
+            filter: drop-shadow(0 10px 30px rgba(200, 160, 98, 0.4));
+        }
+
+        .loading-text {
+            margin-top: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #C8A062, #E6D5B8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 5px;
+            margin-left: 5px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: #C8A062;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+
+        @keyframes pulseRadius {
+            0%, 100% { r: 4; opacity: 0.8; }
+            50% { r: 5; opacity: 1; }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-50px); }
+            100% { transform: translateX(240px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .left-bar, .right-bar {
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .right-bar { animation-delay: 0.5s; }
+
+        .neural-dot-1,
+        .neural-dot-2,
+        .neural-dot-3 {
+            animation: pulseRadius 2s ease-in-out infinite;
+        }
+
+        .neural-dot-2 { animation-delay: 0.3s; }
+        .neural-dot-3 { animation-delay: 0.6s; }
+
+        .neural-line-1,
+        .neural-line-2 {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .neural-line-2 { animation-delay: 0.3s; }
+
+        .shine-effect {
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        .particle-1 { animation: float 3s ease-in-out infinite; }
+        .particle-2 { animation: float 4s ease-in-out infinite; }
+        .particle-3 { animation: float 3.5s ease-in-out infinite; }
+        .particle-4 { animation: float 3.5s ease-in-out infinite; }
+
+        .orbital-ring {
+            animation: rotate 20s linear infinite;
+            transform-origin: 100px 100px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(200, 160, 98, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #C8A062, #E6D5B8);
+            border-radius: 10px;
+            animation: loading 2s ease-in-out;
+            box-shadow: 0 0 10px rgba(200, 160, 98, 0.5);
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+    </style>
+</head>
+
+<script>
+setTimeout(function(){
+    window.location.href = "/login";
+}, 2000);
+</script>
+
+<body>
+    <!-- Gradient Orbs -->
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <div class="logo-container">
+        <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#C8A062"/>
+                    <stop offset="50%" stop-color="#E6D5B8"/>
+                    <stop offset="100%" stop-color="#9B7E4F"/>
+                </linearGradient>
+
+                <linearGradient id="shineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="white" stop-opacity="0"/>
+                    <stop offset="50%" stop-color="white" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+
+            <!-- Logo background -->
+            <circle cx="100" cy="100" r="85" fill="url(#mainGradient)" opacity="0.15"/>
+
+            <!-- Logo -->
+            <rect class="left-bar" x="45" y="50" width="22" height="100" rx="11" fill="url(#mainGradient)"/>
+            <rect class="right-bar" x="133" y="50" width="22" height="100" rx="11" fill="url(#mainGradient)"/>
+            <path d="M67 50 L133 150 L133 130 L85 60 Z" fill="url(#mainGradient)"/>
+
+            <circle class="neural-dot-1" cx="56" cy="65" r="4" fill="#E6D5B8"/>
+            <circle class="neural-dot-2" cx="100" cy="100" r="4" fill="#C8A062"/>
+            <circle class="neural-dot-3" cx="144" cy="135" r="4" fill="#E6D5B8"/>
+
+            <line class="neural-line-1" x1="56" y1="65" x2="100" y2="100" stroke="white" stroke-width="1.5" opacity="0.3"/>
+            <line class="neural-line-2" x1="100" y1="100" x2="144" y2="135" stroke="white" stroke-width="1.5" opacity="0.3"/>
+
+            <rect class="shine-effect" x="-20" y="40" width="30" height="120" fill="url(#shineGradient)" opacity="0.5"/>
+
+            <circle class="particle-1" cx="30" cy="80" r="2" fill="#E6D5B8"/>
+            <circle class="particle-2" cx="170" cy="120" r="2" fill="#C8A062"/>
+            <circle class="particle-3" cx="100" cy="35" r="2.5" fill="#E6D5B8"/>
+            <circle class="particle-4" cx="100" cy="165" r="2.5" fill="#9B7E4F"/>
+
+            <circle class="orbital-ring" cx="100" cy="100" r="90"
+                    stroke="url(#mainGradient)" stroke-width="2"
+                    fill="none" opacity="0.2" stroke-dasharray="5,10"/>
+        </svg>
+
+        <div class="loading-text">
+            NeoLearn
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,11 +3,21 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import mysql.connector, os
 import requests
+from PyPDF2 import PdfReader
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from flask import send_file
+from flask import send_from_directory, abort #add this in mahira
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))#add this in mahira
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')#add this in mahira
+
+#also change teacher upload material,student vievmateria and download material route
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER #add this in mahira
 UPLOAD_FOLDER = 'static/uploads/photos/'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -19,6 +29,102 @@ from config import db_config
 def get_db_connection():
     return mysql.connector.connect(**db_config)
 
+# from PyPDF2 import PdfReader
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.metrics.pairwise import cosine_similarity
+
+# -------------- AI Notes & RAG config --------------
+AI_NOTES_UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads', 'ai_notes')
+os.makedirs(AI_NOTES_UPLOAD_FOLDER, exist_ok=True)
+
+def save_chat_message(username, role, message):
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT INTO ai_chat_history (username, role, message) VALUES (%s, %s, %s)",
+        (username, role, message),
+    )
+    con.commit()
+    cur.close()
+    con.close()
+
+def get_chat_history(username, limit=50):
+    con = get_db_connection()
+    cur = con.cursor(dictionary=True)
+    cur.execute(
+        "SELECT role, message, created_at FROM ai_chat_history "
+        "WHERE username = %s ORDER BY id DESC LIMIT %s",
+        (username, limit),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    con.close()
+    # return oldest -> newest
+    return list(reversed(rows))
+
+def save_document(username, title, content):
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT INTO ai_documents (username, title, content) VALUES (%s, %s, %s)",
+        (username, title, content),
+    )
+    con.commit()
+    cur.close()
+    con.close()
+
+def load_user_documents(username):
+    con = get_db_connection()
+    cur = con.cursor(dictionary=True)
+    cur.execute(
+        "SELECT id, title, content FROM ai_documents "
+        "WHERE username = %s OR username = 'global'",
+        (username,),
+    )
+    docs = cur.fetchall()
+    cur.close()
+    con.close()
+    return docs
+
+def build_context_from_docs(question, docs, max_chunks=3):
+    """
+    Simple RAG:
+    - Split docs into chunks
+    - TF-IDF similarity with question
+    - Pick top chunks as context
+    """
+    chunks = []
+    for d in docs:
+        text = d["content"] or ""
+        title = d["title"]
+        for i in range(0, len(text), 800):
+            chunk_text = text[i:i+800]
+            if chunk_text.strip():
+                chunks.append({"title": title, "text": chunk_text})
+
+    if not chunks:
+        return ""
+
+    corpus = [c["text"] for c in chunks] + [question]
+    vectorizer = TfidfVectorizer().fit(corpus)
+    vectors = vectorizer.transform(corpus)
+    question_vec = vectors[-1]
+    chunk_vecs = vectors[:-1]
+
+    sims = cosine_similarity(question_vec, chunk_vecs)[0]
+    scored = sorted(zip(chunks, sims), key=lambda x: x[1], reverse=True)[:max_chunks]
+
+    selected = [f"From '{c['title']}':\n{c['text']}" for c, _ in scored]
+    return "\n\n---\n\n".join(selected)
+
+def extract_text_from_pdf(path):
+    reader = PdfReader(path)
+    texts = []
+    for page in reader.pages:
+        texts.append(page.extract_text() or "")
+    return "\n\n".join(texts)
+
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
@@ -28,7 +134,8 @@ ADMIN_PASSWORD = "12"
 
 @app.route('/')
 def home():
-    return redirect(url_for('login'))
+    return render_template("landing_school.html")
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -58,6 +165,7 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
     if not session.get('admin'):
@@ -70,60 +178,152 @@ def admin_dashboard():
     cur.execute("SELECT * FROM messages ORDER BY id DESC")
     messages = cur.fetchall()
 
-    # Fetch voting results (make it explicit)
+    # Fetch voting results
     cur.execute("SELECT id, title, option_text, votes FROM votes")
     votes = cur.fetchall()
 
-    # Fetch teacher usernames
+    # Fetch teachers
     cur.execute("SELECT username FROM users WHERE role = 'teacher'")
     teachers = [r[0] for r in cur.fetchall()]
 
+    # Fetch students
+    cur.execute("SELECT username FROM users WHERE role = 'student'")
+    students = cur.fetchall()
+
+    # ✅ FETCH EVENTS (THIS WAS MISSING)
+    cur.execute("""
+        SELECT id, title, description, start_date, end_date, audience
+        FROM events
+        ORDER BY start_date DESC
+    """)
+    events = cur.fetchall()
+
     con.close()
+
     return render_template(
         'admin_dashboard.html',
         messages=messages,
         teachers=teachers,
-        votes=votes
+        students=students,
+        votes=votes,
+        events=events   # ✅ FIXED
     )
+
+@app.route('/admin/create-event', methods=['POST'])
+def create_event():
+    if not session.get('admin'):
+        return redirect(url_for('login'))
+
+    title = request.form['title']
+    description = request.form['description']
+    start_date = request.form['start_date']
+    end_date = request.form.get('end_date')
+    audience = request.form['audience']  # teacher | student | both
+
+    con = get_db_connection()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT INTO events (title, description, start_date, end_date, audience)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (title, description, start_date, end_date, audience))
+
+    con.commit()
+    con.close()
+
+    flash("✅ Event created successfully")
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/admin/register', methods=['POST'])
 def admin_register():
-    if not session.get('admin'): return redirect(url_for('login'))
+    if not session.get('admin'):
+        return redirect(url_for('login'))
 
     username = request.form['username']
     password = generate_password_hash(request.form['password'])
     role = request.form['role']
     standard = request.form.get('standard') if role == 'student' else None
+    email = request.form['email']
+    mobile = request.form['mobile']
+    dob = request.form['dob']
 
     con = get_db_connection()
     cur = con.cursor()
-    try:
-        cur.execute("INSERT INTO users (username, password, role, standard) VALUES (%s, %s, %s, %s)",
-                    (username, password, role, standard))
-        con.commit()
-        flash("User registered successfully.")
-    except:
+
+    # Check duplicate username
+    cur.execute("SELECT id FROM users WHERE username = %s", (username,))
+    if cur.fetchone():
         flash("Username already exists.")
-    con.close()
-    return redirect(url_for('admin_dashboard'))
+        con.close()
+        return redirect(url_for('admin_dashboard'))
+
+    # Insert user
+    cur.execute(
+    """
+    INSERT INTO users (username, password, role, standard, email, mobile, dob)
+    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """,
+    (username, password, role, standard, email, mobile, dob)
+)
 
 
-@app.route('/admin-message', methods=['POST'])
-def admin_message():
-    if not session.get('admin'): return redirect(url_for('login'))
-
-    content = request.form['message']
-    to = request.form['to']
-
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute("INSERT INTO messages (content, recipient) VALUES (%s, %s)", (content, to))
     con.commit()
     con.close()
 
-    flash("Message sent.")
+    flash("User registered successfully.")
     return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/message', methods=['GET', 'POST'])
+def admin_message():
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        message = request.form.get('message')
+        recipient = request.form.get('recipient')
+
+        if not message or not recipient:
+            flash("Message or recipient missing")
+            return redirect(url_for('admin_message'))
+
+        con = get_db_connection()
+        cur = con.cursor()
+        cur.execute(
+            "INSERT INTO messages (content, recipient) VALUES (%s, %s)",
+            (message, recipient)
+        )
+        con.commit()
+        con.close()
+
+        flash("✅ Message sent successfully")
+        return redirect(url_for('admin_dashboard'))
+
+    # 👇 GET request → just show admin dashboard
+    return redirect(url_for('admin_dashboard'))
+
+
+
+@app.route('/admin/recent-messages')
+def admin_recent_messages():
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT content, recipient
+        FROM messages
+        ORDER BY id DESC
+    """)
+    messages = cur.fetchall()
+    con.close()
+
+    return render_template(
+        'admin_recent_messages.html',
+        messages=messages
+    )
 
 
 @app.route('/admin/create-vote', methods=['GET', 'POST'])
@@ -185,7 +385,7 @@ def delete_vote():
     if not session.get('admin'):
         return redirect(url_for('login'))
 
-    title = request.form.get('title', '').strip()
+    title = request.form.get('vote_title', '').strip()
 
     if not title:
         flash("⚠️ No vote title selected.", "warning")
@@ -282,97 +482,354 @@ def vote():
 
 @app.route('/admin/student-votes', methods=['GET', 'POST'])
 def view_student_votes():
-    if not session.get('admin'):
+
+    if 'admin' not in session:
         return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor(dictionary=True)
+
+    # Fetch students for dropdown
+    cur.execute("SELECT username FROM users WHERE role='student'")
+    students = [row['username'] for row in cur.fetchall()]
 
     selected_student = None
     votes = []
 
-    con = get_db_connection()
-    cur = con.cursor()
-
-    # Get all student usernames
-    cur.execute("SELECT username FROM users WHERE role = 'student'")
-    students = [row[0] for row in cur.fetchall()]
-
     if request.method == 'POST':
         selected_student = request.form.get('student')
-    
-    
-        # ✅ Fetch voting history including timestamp
-        cur.execute("""
-            SELECT sv.vote_title, vo.option, sv.voted_at
-            FROM student_votes sv
-            JOIN vote_options vo ON sv.option_id = vo.id
-            WHERE sv.username = %s
-            ORDER BY sv.voted_at DESC
-        """, (selected_student,))
-        votes = cur.fetchall()
+
+        if selected_student:
+            cur.execute("""
+                SELECT
+                    sv.vote_title,
+                    v.option_text,
+                    sv.voted_at
+                FROM student_votes sv
+                JOIN votes v ON sv.option_id = v.id
+                WHERE sv.username = %s
+                ORDER BY sv.voted_at DESC
+            """, (selected_student,))
+            votes = cur.fetchall()
 
     con.close()
 
-    return render_template("admin_student_votes.html",
+    return render_template(
+        "admin_student_votes.html",
         students=students,
         selected_student=selected_student,
         votes=votes
     )
+
 
 @app.route('/student/chat', methods=['GET', 'POST'])
 def student_chat():
     if 'student' not in session:
         return redirect(url_for('login'))
 
-    response = ""
+    username = session['student']
+    last_error = None
+    last_info = None
+
     if request.method == 'POST':
-        user_input = request.form['message']
-        try:
-            result = requests.post("http://127.0.0.1:11434/api/generate", json={
-                "model": "llama3",
-                "prompt": user_input,
-                "stream": False
-            })
-            result.raise_for_status()
-            data = result.json()
-            response = data.get("response", "No response from AI.")
-        except Exception as e:
-            response = f"Error: {e}"
 
-    return render_template('student_chat.html', response=response)
+        # ===============================
+        # FILE UPLOAD (PDF / TXT / MD)
+        # ===============================
+        if 'file' in request.files and request.files['file'].filename != '':
+            uploaded = request.files['file']
 
+            filename = secure_filename(uploaded.filename)
+            ext = filename.lower().rsplit('.', 1)[-1]
+            save_path = os.path.join(AI_NOTES_UPLOAD_FOLDER, filename)
+            uploaded.save(save_path)
 
-@app.route('/teacher')
+            try:
+                if ext == 'pdf':
+                    text_content = extract_text_from_pdf(save_path)
+                elif ext in ('txt', 'md'):
+                    with open(save_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        text_content = f.read()
+                else:
+                    last_error = "Only PDF, TXT, and MD files are supported."
+                    text_content = ""
+
+                if text_content.strip():
+                    save_document(username, filename, text_content)
+                    last_info = f"📄 File '{filename}' uploaded and indexed."
+                elif not last_error:
+                    last_error = "Could not extract any text from the file."
+
+            except Exception as e:
+                last_error = f"❌ File processing error: {e}"
+
+        # ===============================
+        # CHAT MESSAGE
+        # ===============================
+        else:
+            user_input = request.form.get('message', '').strip()
+
+            if not user_input:
+                last_error = "Please type a message."
+            else:
+                # Save user message
+                save_chat_message(username, 'user', user_input)
+
+                # Build RAG context
+                docs = load_user_documents(username)
+                context = build_context_from_docs(user_input, docs)
+
+                if context:
+                    prompt = (
+                        "You are an AI tutor. Use the student's notes below "
+                        "to help answer the question. If the notes are not helpful, "
+                        "answer normally.\n\n"
+                        f"Notes:\n{context}\n\n"
+                        f"Question: {user_input}"
+                    )
+                else:
+                    prompt = user_input
+
+                # ===============================
+                # OLLAMA CALL (FIXED)
+                # ===============================
+                try:
+                    result = requests.post(
+                        "http://127.0.0.1:11434/api/generate",
+                        json={
+                            "model": "tinyllama",   # ✅ FIXED
+                            "prompt": prompt,
+                            "stream": False
+                        },
+                        timeout=120
+                    )
+
+                    result.raise_for_status()
+
+                    data = result.json()   # ✅ FIXED
+                    response = data.get("response", "No response from AI.")
+
+                    save_chat_message(username, 'assistant', response)
+
+                except Exception as e:
+                    last_error = f"❌ Error talking to AI: {e}"
+
+    # ===============================
+    # LOAD CHAT HISTORY
+    # ===============================
+    history = get_chat_history(username)
+
+    return render_template(
+        'student_chat.html',
+        history=history,
+        last_error=last_error,
+        last_info=last_info
+    )
+
+@app.route('/teacher', methods=['GET', 'POST'])
 def teacher_dashboard():
+
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor(dictionary=True)
+    
+    
+
+    # Admin messages
+    cur.execute("SELECT content FROM messages WHERE recipient IN ('teacher','all') ORDER BY id DESC")
+    messages = [row['content'] for row in cur.fetchall()]
+
+    # Materials
+    cur.execute("SELECT * FROM materials")
+    materials = cur.fetchall()
+
+    # Quizzes
+    cur.execute("SELECT * FROM quizzes")
+    quizzes = cur.fetchall()
+
+    # Students (for photo upload section)
+    cur.execute("SELECT username, standard, photo FROM users WHERE role='student'")
+    students = cur.fetchall()
+
+    # Event updates
+    cur.execute("""
+        SELECT title, description, start_date
+        FROM events
+        WHERE audience IN ('teacher','both')
+        ORDER BY start_date ASC
+    """)
+    event_updates = cur.fetchall()
+    
+    # Upcoming live classes
+    cur.execute("""
+    SELECT subject, standard, duration, date
+    FROM live_classes
+    WHERE DATE_ADD(date, INTERVAL duration MINUTE) > NOW()
+    ORDER BY date ASC
+    """)
+    upcoming_classes = cur.fetchall()
+
+    # Quiz scores (from your quiz_scores table)
+    cur.execute("""
+        SELECT name AS username,
+               subject AS quiz_title,
+               score,
+               taken_at AS date
+        FROM quiz_scores
+        ORDER BY taken_at DESC
+    """)
+    quiz_scores = cur.fetchall()
+
+    con.close()
+    teacher = session.get('teacher')
+
+    return render_template(
+        "dashboard.html",
+        teacher=teacher,
+        materials=materials,
+        messages=messages,
+        quizzes=quizzes,     # ✅ FIX
+        students=students, 
+        event_updates=event_updates,
+        quiz_scores=quiz_scores,
+        upcoming_classes=upcoming_classes
+)
+
+@app.route('/teacher/queries')
+def teacher_queries():
     if 'teacher' not in session:
         return redirect(url_for('login'))
 
     con = get_db_connection()
     cur = con.cursor()
 
-    # Fetch study materials
-    cur.execute("SELECT * FROM materials")
-    materials = cur.fetchall()
+    cur.execute("""
+        SELECT id, student_username, subject, message, status, created_at
+        FROM student_queries
+        WHERE teacher_username=%s
+        ORDER BY created_at DESC
+    """, (session['teacher'],))
 
-    # Fetch quizzes
-    cur.execute("SELECT * FROM quizzes")
-    quizzes = cur.fetchall()
+    queries = cur.fetchall()
 
-    # Fetch admin messages
-    cur.execute("SELECT content FROM messages WHERE recipient IN ('teacher', 'all')")
-    messages = [row[0] for row in cur.fetchall()]
-
-    # Fetch registered students (from admin) — include their uploaded photo if any
-    cur.execute("SELECT username, standard, photo FROM users WHERE role='student'")
-    students = cur.fetchall()
+    # 🔔 notification count
+    cur.execute("""
+        SELECT COUNT(*) FROM student_queries
+        WHERE teacher_username=%s AND status='open'
+    """, (session['teacher'],))
+    new_count = cur.fetchone()[0]
 
     con.close()
+    return render_template(
+        'teacher_queries.html',
+        queries=queries,
+        new_count=new_count
+    )
+
+@app.route('/teacher/reply-query/<int:qid>', methods=['POST'])
+def reply_query(qid):
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor()
+
+    cur.execute("""
+        UPDATE student_queries
+        SET reply=%s, status='replied'
+        WHERE id=%s
+    """, (request.form['reply'], qid))
+
+    con.commit()
+    con.close()
+    return redirect(url_for('teacher_queries'))
+
+
+@app.route('/teacher/close-query/<int:qid>')
+def close_query(qid):
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute("UPDATE student_queries SET status='closed' WHERE id=%s", (qid,))
+    con.commit()
+    con.close()
+    return redirect(url_for('teacher_queries'))
+
+@app.route('/teacher/send-standard-message', methods=['GET', 'POST'])
+def send_standard_message():
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        standard = request.form['standard']
+        message = request.form['message']
+
+        con = get_db_connection()
+        cur = con.cursor()
+
+        cur.execute("""
+            INSERT INTO teacher_broadcasts
+            (teacher_username, standard, message)
+            VALUES (%s, %s, %s)
+        """, (session['teacher'], standard, message))
+
+        con.commit()
+        con.close()
+
+        return redirect(url_for('send_standard_message'))
+
+    return render_template('teacher_send_message.html')
+
+
+@app.route('/teacher/profile')
+def teacher_profile():
+    cursor = mysql.connection.cursor()
+    cursor.execute("""
+        SELECT full_name, employee_id, dob, gender, mobile,
+               alternate_mobile, official_email, personal_email,
+               address, profile_photo
+        FROM teachers
+        WHERE employee_id = %s
+    """, (session['employee_id'],))
+    
+    teacher = cursor.fetchone()
+    cursor.close()
 
     return render_template(
-        'dashboard.html',
-        materials=materials,
-        quizzes=quizzes,
-        messages=messages,
-        students=students
+        "updated_teacher_dashboard.html",
+        teacher=teacher,
+        section="profile"
     )
+@app.route('/upload-teacher-photo', methods=['POST'])
+def upload_teacher_photo():
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    file = request.files.get('photo')
+    if not file or file.filename == '':
+        flash("No photo selected")
+        return redirect(url_for('teacher_dashboard'))
+
+    filename = secure_filename(session['teacher'] + "_" + file.filename)
+    save_path = os.path.join('static/uploads/photos', filename)
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    file.save(save_path)
+
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute(
+        "UPDATE users SET photo=%s WHERE username=%s",
+        (filename, session['teacher'])
+    )
+    con.commit()
+    con.close()
+
+    flash("✅ Profile photo updated")
+    return redirect(url_for('teacher_dashboard'))
 
 
 @app.route('/upload-student-photo/<username>', methods=['POST'])
@@ -430,7 +887,7 @@ def create_quiz():
         con.commit()
         con.close()
 
-        flash(f"{len(questions)} questions added successfully!")
+        flash("Quiz created successfully!")
         return redirect(url_for('teacher_dashboard'))
 
     return render_template('create_quiz.html')
@@ -531,35 +988,6 @@ def quiz_scores():
     con.close()
     return render_template('quiz_scores.html', scores=scores)
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_material():
-    if not session.get('teacher'):
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        title = request.form['title']
-        standard = request.form['standard']
-        subject = request.form['subject']
-        file = request.files['file']
-
-        if file:
-            filename = secure_filename(file.filename)
-            upload_path = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(upload_path)
-
-            con = get_db_connection()
-            cur = con.cursor()
-            cur.execute("""
-                INSERT INTO materials (title, standard, subject, filename)
-                VALUES (%s, %s, %s, %s)
-            """, (title, standard, subject, filename))
-            con.commit()
-            con.close()
-
-            flash("Material uploaded successfully!")
-            return redirect(url_for('teacher_dashboard'))
-
-    return render_template('upload.html')
 
 @app.route('/materials')
 def view_materials():
@@ -580,6 +1008,78 @@ def view_materials():
     con.close()
 
     return render_template('materials.html', materials=materials)
+
+# @app.route('/upload-material', methods=['GET','POST'])
+# def upload_material():
+#     if 'teacher' not in session:
+#         return redirect(url_for('login'))
+
+#     if request.method == 'POST':
+#         title = request.form['title']
+#         standard = request.form['standard']
+#         subject = request.form['subject']
+#         file = request.files['file']
+
+#         filename = file.filename
+#         file.save(os.path.join('static/uploads', filename))
+
+#         con = get_db_connection()
+#         cur = con.cursor()
+#         cur.execute("""INSERT INTO materials(title,standard,subject,filename)
+#                        VALUES(%s,%s,%s,%s)""",
+#                     (title,standard,subject,filename))
+#         con.commit()
+#         con.close()
+
+#         flash("Material uploaded successfully")
+#         return redirect('/teacher')
+
+#     return render_template("upload.html")
+from werkzeug.utils import secure_filename
+import os
+
+@app.route('/upload-material', methods=['GET', 'POST'])
+def upload_material():
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        standard = request.form['standard']
+        subject = request.form['subject']
+        file = request.files['file']
+
+        if not file or file.filename == '':
+            flash("No file selected")
+            return redirect(request.url)
+
+        # 🔐 Secure filename
+        filename = secure_filename(file.filename)
+
+        # 📁 Absolute upload path
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+        # 📂 Ensure folder exists
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+        # 💾 Save file
+        file.save(file_path)
+
+        # 💾 Save ONLY filename in DB
+        con = get_db_connection()
+        cur = con.cursor()
+        cur.execute("""
+            INSERT INTO materials (title, standard, subject, filename)
+            VALUES (%s, %s, %s, %s)
+        """, (title, standard, subject, filename))
+        con.commit()
+        con.close()
+
+        flash("Material uploaded successfully")
+        return redirect('/teacher')
+
+    return render_template("upload.html")
+
 
 @app.route('/edit-material/<int:id>', methods=['GET', 'POST'])
 def edit_material(id):
@@ -614,60 +1114,197 @@ def delete_material(id):
     con = get_db_connection()
     cur = con.cursor()
 
-    cur.execute("SELECT filename FROM materials WHERE id=%s", (id,))
+    cur.execute("SELECT filename FROM materials WHERE id=%s",(id,))
     file = cur.fetchone()
     if file:
-        filepath = os.path.join(UPLOAD_FOLDER, file[0])
-        if os.path.exists(filepath):
-            os.remove(filepath)
+        path = os.path.join('static/uploads', file[0])
+        if os.path.exists(path):
+            os.remove(path)
 
-    cur.execute("DELETE FROM materials WHERE id=%s", (id,))
+    cur.execute("DELETE FROM materials WHERE id=%s",(id,))
     con.commit()
     con.close()
-    flash("Material deleted.")
-    return redirect(url_for('teacher_dashboard'))
+    flash("Material deleted")
+    return redirect('/teacher')
+
+
+from flask import send_file
+
+@app.route('/view-material/<path:filename>')
+def teacher_view_material(filename):
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if not os.path.exists(file_path):
+        abort(404)
+
+    return send_from_directory(
+        app.config['UPLOAD_FOLDER'],
+        filename,
+        as_attachment=False
+    )
+
+# 🔹 View material INLINE (no download)
+# @app.route('/student/view-material/<filename>')
+# def student_view_material(filename):
+#     if 'student' not in session:
+#         return redirect(url_for('login'))
+
+#     file_path = os.path.join('static/uploads', filename)
+
+#     return send_file(
+#         file_path,
+#         mimetype='application/pdf',
+#         as_attachment=False   # 👈 inline view
+#     )
+@app.route('/student/view-material/<path:filename>')
+def student_view_material(filename):
+    if 'student' not in session:
+        return redirect(url_for('login'))
+
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if not os.path.exists(file_path):
+        abort(404, description="Material not found")
+
+    return send_from_directory(
+        app.config['UPLOAD_FOLDER'],
+        filename,
+        as_attachment=False
+    )
+
+
+
+# 🔹 Download material
+# @app.route('/student/download-material/<filename>')
+# def student_download_material(filename):
+#     if 'student' not in session:
+#         return redirect(url_for('login'))
+
+#     file_path = os.path.join('static/uploads', filename)
+
+#     return send_file(
+#         file_path,
+#         as_attachment=True    # 👈 force download
+#     )
+@app.route('/student/download-material/<path:filename>')
+def student_download_material(filename):
+    if 'student' not in session:
+        return redirect(url_for('login'))
+
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if not os.path.exists(file_path):
+        abort(404, description="Material not found")
+
+    return send_from_directory(
+        app.config['UPLOAD_FOLDER'],
+        filename,
+        as_attachment=True
+    )
+
+
 
 @app.route('/student', methods=['GET', 'POST'])
 def student_dashboard():
+
     if 'student' not in session:
         return redirect(url_for('login'))
 
     username = session['student']
     con = get_db_connection()
-    cur = con.cursor()
+    cur = con.cursor(dictionary=True)
 
-    # Get student's own standard
-    cur.execute("SELECT standard FROM users WHERE username=%s", (username,))
+    # -------------------------------
+    # Get student's standard
+    # -------------------------------
+    cur.execute(
+        "SELECT standard FROM users WHERE username=%s",
+        (username,)
+    )
     result = cur.fetchone()
 
     if not result:
         flash("Could not fetch your standard.")
+        con.close()
         return redirect(url_for('login'))
 
-    student_standard = result[0]
+    student_standard = result['standard']
 
-    # Get available subjects for this student's standard
-    cur.execute("SELECT DISTINCT subject FROM materials WHERE standard=%s", (student_standard,))
-    subjects = [r[0] for r in cur.fetchall()]
+    # -------------------------------
+    # Subjects (for dropdown)
+    # -------------------------------
+    cur.execute(
+        "SELECT DISTINCT subject FROM materials WHERE standard=%s",
+        (student_standard,)
+    )
+    subjects = [r['subject'] for r in cur.fetchall()]
 
-    # Get messages for students
-    cur.execute("SELECT content FROM messages WHERE recipient IN ('student', 'all')")
-    messages = [row[0] for row in cur.fetchall()]
+    # -------------------------------
+    # Messages (admin announcements)
+    # -------------------------------
+    cur.execute(
+        "SELECT content FROM messages WHERE recipient IN ('student','all')"
+    )
+    messages = [row['content'] for row in cur.fetchall()]
 
-    # Get vote titles the student has voted in
-    cur.execute("SELECT vote_title FROM student_votes WHERE username = %s", (username,))
-    voted_titles = [row[0] for row in cur.fetchall()]
+    # -------------------------------
+    # Votes
+    # -------------------------------
+    cur.execute(
+        "SELECT vote_title FROM student_votes WHERE username=%s",
+        (username,)
+    )
+    voted_titles = [row['vote_title'] for row in cur.fetchall()]
 
+    # -------------------------------
+    # Event Updates
+    # -------------------------------
+    cur.execute("""
+        SELECT title, description, start_date
+        FROM events
+        WHERE audience IN ('student','both')
+        ORDER BY start_date ASC
+    """)
+    event_updates = cur.fetchall()
+
+    # -------------------------------
+    # Live Classes
+    # -------------------------------
+    cur.execute("""
+        SELECT subject, standard, duration, date
+        FROM live_classes
+        WHERE standard=%s
+          AND DATE_ADD(date, INTERVAL duration MINUTE) > NOW()
+        ORDER BY date ASC
+    """, (student_standard,))
+    live_classes = cur.fetchall()
+
+    # -------------------------------
+    # Materials (filter by subject)
+    # -------------------------------
     materials = []
+    selected_subject = None
 
     if request.method == 'POST':
         selected_subject = request.form.get('subject')
 
-        query = "SELECT * FROM materials WHERE standard = %s"
+        query = """
+            SELECT
+                id,
+                standard,
+                subject,
+                title,
+                filename AS file_path
+            FROM materials
+            WHERE standard=%s
+        """
         params = [student_standard]
 
         if selected_subject:
-            query += " AND subject = %s"
+            query += " AND subject=%s"
             params.append(selected_subject)
 
         cur.execute(query, params)
@@ -675,14 +1312,112 @@ def student_dashboard():
 
     con.close()
 
+    # -------------------------------
+    # Render Template
+    # -------------------------------
     return render_template(
         "student_home.html",
         subjects=subjects,
         materials=materials,
+        selected_subject=selected_subject,
         messages=messages,
         voted_titles=voted_titles,
-        student_standard=student_standard
+        student_standard=student_standard,
+        event_updates=event_updates,
+        live_classes=live_classes
     )
+
+
+@app.route('/student/send-query', methods=['POST'])
+def send_query():
+    if 'student' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT INTO student_queries
+        (student_username, teacher_username, subject, message)
+        VALUES (%s,%s,%s,%s)
+    """, (
+        session['student'],
+        request.form['teacher'],
+        request.form['subject'],
+        request.form['message']
+    ))
+
+    con.commit()
+    con.close()
+    return redirect(url_for('my_queries'))
+
+@app.route('/student/ask-query')
+def ask_query():
+    if 'student' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor()
+
+    cur.execute("SELECT username FROM users WHERE role='teacher'")
+    teachers = [t[0] for t in cur.fetchall()]
+
+    con.close()
+    return render_template('ask_query.html', teachers=teachers)
+
+@app.route('/student/my-queries')
+def my_queries():
+    if 'student' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT subject, message, reply, status, created_at
+        FROM student_queries
+        WHERE student_username=%s
+        ORDER BY created_at DESC
+    """, (session['student'],))
+
+    my_queries = cur.fetchall()
+    con.close()
+    return render_template('student_queries.html', my_queries=my_queries)
+
+@app.route('/student/standard-messages')
+def student_standard_messages():
+    if 'student' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor(dictionary=True)
+
+    # get student's standard
+    cur.execute(
+        "SELECT standard FROM users WHERE username=%s",
+        (session['student'],)
+    )
+    standard = cur.fetchone()['standard']
+
+    # fetch messages for that standard
+    cur.execute("""
+        SELECT teacher_username, message, created_at
+        FROM teacher_broadcasts
+        WHERE standard=%s
+        ORDER BY created_at DESC
+    """, (standard,))
+
+    messages = cur.fetchall()
+    con.close()
+
+    return render_template(
+        'student_standard_messages.html',
+        messages=messages,
+        standard=standard
+    )
+
+
+
 
 # ------------------ Host Meeting ------------------
 @app.route('/host-meeting')
@@ -691,6 +1426,32 @@ def host_meeting():
         return redirect(url_for('login'))
     room_name = "classroom_" + session['teacher']
     return render_template("live_meeting.html", room_name=room_name, user=session['teacher'], role='teacher')
+
+@app.route('/schedule-class', methods=['GET','POST'])
+def schedule_class():
+    if 'teacher' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        subject = request.form['subject']
+        standard = request.form['standard']
+        duration = request.form['duration']
+        date = request.form['date']
+
+        con = get_db_connection()
+        cur = con.cursor()
+        cur.execute("""
+        INSERT INTO live_classes (subject, standard, duration, date)
+        VALUES (%s,%s,%s,%s)
+""",    (subject, standard, duration, date))
+        con.commit()
+
+        con.close()
+        flash("Class Scheduled Successfully!")
+        return redirect('/teacher')
+
+    return render_template("schedule_class.html")
+
 
 # ------------------ Join Meeting ------------------
 @app.route('/join-meeting')
@@ -731,3 +1492,6 @@ def view_feedback():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+

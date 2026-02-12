@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Quiz - NeoLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        /* ─── Body ─── */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient radial glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Quiz Container ─── */
+        .quiz-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 540px;
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 36px 32px 32px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(200, 160, 98, 0.12);
+            overflow: hidden;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Gold shimmer bar */
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Quiz Header ─── */
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .title-accent {
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .quiz-header h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin: 0;
+        }
+
+        .quiz-header p {
+            color: rgba(11, 29, 53, 0.5);
+            font-size: 0.82rem;
+            margin-top: 3px;
+        }
+
+        /* ─── Quiz Form ─── */
+        .quiz-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ─── Form Groups ─── */
+        .form-group {
+            position: relative;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.08s; }
+        .form-group:nth-child(2) { animation-delay: 0.16s; }
+        .form-group:nth-child(3) { animation-delay: 0.24s; }
+
+        .form-group:focus-within {
+            transform: scale(1.01);
+            transition: transform 0.2s ease;
+        }
+
+        /* ─── Labels ─── */
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--navy-medium);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* ─── Inputs & Selects ─── */
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(200, 160, 98, 0.25);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: rgba(250, 247, 240, 0.5);
+            color: var(--navy-deep);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control::placeholder {
+            color: rgba(11, 29, 53, 0.4);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: rgba(250, 247, 240, 0.9);
+            box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.12);
+        }
+
+        /* Select dropdown styling */
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239B7E4F' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 14px center;
+            background-repeat: no-repeat;
+            background-size: 1.2rem;
+            padding-right: 42px;
+        }
+
+        /* ─── Buttons ─── */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+
+        /* Ripple */
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Primary – gold gradient */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
+        }
+
+        /* Secondary – outlined */
+        .btn-secondary {
+            background: rgba(250, 247, 240, 0.9);
+            color: var(--navy-medium);
+            border: 2px solid rgba(200, 160, 98, 0.4);
+            box-shadow: var(--shadow-sm);
+            margin-top: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--cream-dark);
+            border-color: var(--gold-primary);
+            color: var(--navy-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(200, 160, 98, 0.25);
+        }
+
+        /* Loading state */
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%; right: 18px;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            transform: translateY(-50%);
+        }
+
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* ─── Messages ─── */
+        .success-message,
+        .error-message {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-align: center;
+            animation: slideInDown 0.4s ease;
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-message {
+            background: rgba(39, 174, 96, 0.1);
+            color: #1e8449;
+            border-left: 4px solid #27ae60;
+        }
+
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+            border-left: 4px solid #e74c3c;
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar         { width: 6px; }
+        ::-webkit-scrollbar-track   { background: rgba(250, 247, 240, 0.3); }
+        ::-webkit-scrollbar-thumb   { background: rgba(200, 160, 98, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(200, 160, 98, 0.5); }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 600px) {
+            body { padding: 24px 12px; align-items: flex-start; padding-top: 40px; }
+
+            .quiz-container { padding: 28px 20px 24px; }
+
+            .quiz-header h2 { font-size: 1.35rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+
+    <!-- Header -->
+    <div class="quiz-header">
+        <div class="title-accent"></div>
+        <div>
+            <h2>📚 Take Quiz</h2>
+            <p>Select your details to start your personalized quiz experience</p>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form method="post" class="quiz-form" id="quizForm">
+        
+        <div class="form-group">
+            <label for="name">Student Name</label>
+            <input type="text" name="name" id="name" placeholder="Enter your full name" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="standard">Standard</label>
+            <select name="standard" id="standard" class="form-control" required>
+                <option value="">Select your standard</option>
+                <option value="1st">1st Standard</option>
+                <option value="2nd">2nd Standard</option>
+                <option value="3rd">3rd Standard</option>
+                <option value="4th">4th Standard</option>
+                <option value="5th">5th Standard</option>
+                <option value="6th">6th Standard</option>
+                <option value="7th">7th Standard</option>
+                <option value="8th">8th Standard</option>
+                <option value="9th">9th Standard</option>
+                <option value="10th">10th Standard</option>
+                <option value="11th">11th Standard</option>
+                <option value="12th">12th Standard</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <select name="subject" id="subject" class="form-control" required>
+                <option value="">Select subject</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Science">Science</option>
+                <option value="English">English</option>
+                <option value="Social Studies">Social Studies</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+                <option value="History">History</option>
+                <option value="Geography">Geography</option>
+                <option value="Computer Science">Computer Science</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="startQuizBtn">
+            🚀 Start Quiz
+        </button>
+
+        <a href="/student" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </form>
+
+</div>
+
+<script>
+    // Form submission loading state
+    document.getElementById('quizForm').addEventListener('submit', function () {
+        const submitBtn = document.getElementById('startQuizBtn');
+        submitBtn.classList.add('btn-loading');
+        submitBtn.innerHTML = '🔄 Starting Quiz...';
+        submitBtn.disabled = true;
+    });
+
+    // Input focus scaling
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function () {
+            this.parentElement.style.transform = 'scale(1.01)';
+        });
+        
+        input.addEventListener('blur', function () {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Live Class</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        /* ─── Body ─── */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient radial glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Card Shell ─── */
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 36px 32px 32px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(200, 160, 98, 0.12);
+            overflow: hidden;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Gold shimmer bar across top */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Card Header ─── */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .title-accent {
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .card-header h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin: 0;
+        }
+
+        /* ─── Form Groups ─── */
+        .form-group {
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.08s; }
+        .form-group:nth-child(2) { animation-delay: 0.16s; }
+        .form-group:nth-child(3) { animation-delay: 0.24s; }
+        .form-group:nth-child(4) { animation-delay: 0.32s; }
+
+        .form-group:focus-within {
+            transform: scale(1.01);
+            transition: transform 0.2s ease;
+        }
+
+        /* ─── Labels ─── */
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--navy-medium);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* ─── Inputs ─── */
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(200, 160, 98, 0.25);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: rgba(250, 247, 240, 0.5);
+            color: var(--navy-deep);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(11, 29, 53, 0.4);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: rgba(250, 247, 240, 0.9);
+            box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.12);
+        }
+
+        /* Native date/time picker accent */
+        .form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: opacity(0.5);
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            filter: opacity(0.85);
+        }
+
+        /* ─── Two-column row for Subject & Standard ─── */
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* ─── Button ─── */
+        .btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 13px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Ripple */
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
+        }
+
+        /* Loading state */
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%; right: 14px;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            transform: translateY(-50%);
+        }
+
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar         { width: 6px; }
+        ::-webkit-scrollbar-track   { background: rgba(250, 247, 240, 0.3); }
+        ::-webkit-scrollbar-thumb   { background: rgba(200, 160, 98, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(200, 160, 98, 0.5); }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 560px) {
+            body { padding: 24px 12px; align-items: flex-start; padding-top: 40px; }
+
+            .card { padding: 28px 20px 24px; }
+
+            .card-header h2 { font-size: 1.35rem; }
+
+            .field-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <!-- Header with accent bar -->
+    <div class="card-header">
+        <div class="title-accent"></div>
+        <h2>📅 Schedule Live Class</h2>
+    </div>
+
+    <form action="/schedule-class" method="POST" id="scheduleForm">
+
+        <!-- Subject & Standard side by side -->
+        <div class="field-row">
+            <div class="form-group">
+                <label>Subject</label>
+                <input type="text" name="subject" placeholder="e.g. Mathematics" required>
+            </div>
+            <div class="form-group">
+                <label>Standard</label>
+                <input type="text" name="standard" placeholder="e.g. 10th" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Duration (minutes)</label>
+            <input type="number" name="duration" placeholder="e.g. 45" min="1" required>
+        </div>
+
+        <div class="form-group">
+            <label>Date & Time</label>
+            <input type="datetime-local" name="date" required>
+        </div>
+
+        <button class="btn" type="submit" id="submitBtn">📅 Schedule Class</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('scheduleForm').addEventListener('submit', function () {
+        document.getElementById('submitBtn').classList.add('loading');
+    });
+</script>
+</body>
+</html>

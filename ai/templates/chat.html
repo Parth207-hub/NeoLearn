@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Chat</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; }
+    #chat-box {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .message { margin: 5px 0; padding: 6px 10px; border-radius: 6px; max-width: 80%; }
+    .user { background: #d1e7ff; margin-left: auto; text-align: right; }
+    .bot  { background: #e8e8e8; margin-right: auto; text-align: left; }
+    #input-row { display: flex; gap: 8px; }
+    #message-input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>AI Assistant</h2>
+  <div id="chat-box"></div>
+
+  <div id="input-row">
+    <input type="text" id="message-input" placeholder="Type your message..." />
+    <button id="send-btn">Send</button>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const input   = document.getElementById("message-input");
+    const sendBtn = document.getElementById("send-btn");
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.classList.add("message", sender);
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      input.value = "";
+
+      addMessage("Thinking...", "bot");
+      const thinkingDiv = chatBox.lastChild;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+        chatBox.removeChild(thinkingDiv);
+
+        if (data.reply) {
+          addMessage(data.reply, "bot");
+        } else {
+          addMessage("Error: " + (data.error || "Unknown error"), "bot");
+        }
+      } catch (err) {
+        chatBox.removeChild(thinkingDiv);
+        addMessage("Failed to reach server.", "bot");
+      }
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Quiz - NeoLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,14 +12,51 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        /* ─── Body ─── */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #2d3748;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
             min-height: 100vh;
             overflow-x: hidden;
             padding: 20px;
+        }
+
+        /* Ambient radial glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Main Content ─── */
+        .main-content {
+            padding-top: 40px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
         }
 
         .container {
@@ -27,489 +65,476 @@
             padding: 0 20px;
         }
 
-        /* Header */
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #4a5568;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Main Content */
-        .main-content {
-            padding-top: 100px;
-            min-height: 100vh;
-        }
-
+        /* ─── Quiz Outer Card ─── */
         .quiz-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(250, 247, 240, 0.98);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 16px;
+            padding: 36px 32px 32px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(200, 160, 98, 0.12);
             position: relative;
             overflow: hidden;
             margin-bottom: 2rem;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Gold shimmer bar */
         .quiz-container::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
         }
 
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Quiz Header ─── */
         .quiz-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .title-accent {
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+            border-radius: 2px;
+            flex-shrink: 0;
         }
 
         .quiz-header h2 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin: 0;
         }
 
         .quiz-header p {
-            color: #718096;
-            font-size: 1.1rem;
+            color: rgba(11, 29, 53, 0.5);
+            font-size: 0.85rem;
+            margin-top: 4px;
         }
 
-        /* Question Blocks */
-        .border {
-            border: 2px solid #e2e8f0 !important;
-            border-radius: 15px;
-            padding: 2rem !important;
-            margin-bottom: 2rem !important;
-            background: white;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        /* ─── Question Block ─── */
+        .question-block {
+            border: 2px solid rgba(200, 160, 98, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            background: rgba(250, 247, 240, 0.6);
+            box-shadow: var(--shadow-sm);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .border::before {
+        /* Left gold accent bar on each question block */
+        .question-block::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
         }
 
-        .border:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-
-        .border h5 {
-            color: #2d3748;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .border h5::before {
-            content: '❓';
-            font-size: 1.2rem;
-        }
-
-        /* Form Controls */
-        .form-control {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            background: white;
-            transition: all 0.3s ease;
-            outline: none;
-            margin: 0.5rem 0;
-        }
-
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        .question-block:hover {
+            border-color: rgba(200, 160, 98, 0.4);
+            box-shadow: var(--shadow-md);
             transform: translateY(-2px);
         }
 
-        .form-control:hover {
-            border-color: #cbd5e0;
+        .question-block.question-block-new {
+            animation: slideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* Button Styles */
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
+        /* Question number heading */
+        .question-block h5 {
+            color: var(--navy-deep);
+            font-family: 'Crimson Pro', serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-block h5 .q-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            font-size: 1rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            margin: 0.5rem;
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
         }
 
+        /* ─── Form Labels ─── */
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--navy-medium);
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        /* ─── Inputs & Textarea ─── */
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid rgba(200, 160, 98, 0.25);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: rgba(250, 247, 240, 0.5);
+            color: var(--navy-deep);
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 10px;
+        }
+
+        .form-control::placeholder {
+            color: rgba(11, 29, 53, 0.38);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: rgba(250, 247, 240, 0.9);
+            box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.12);
+        }
+
+        textarea.form-control {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        /* ─── Option Grid (A B C D side by side on wide screens) ─── */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 16px;
+        }
+
+        .option-wrap {
+            position: relative;
+        }
+
+        /* Small colored dot before each option label */
+        .option-wrap .form-label::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold-primary);
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        /* ─── Shared fields row (Subject + Standard) ─── */
+        .shared-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 8px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(200, 160, 98, 0.15);
+        }
+
+        /* ─── Buttons ─── */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Ripple */
         .btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
 
-        .btn:hover::before {
-            left: 100%;
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
         }
 
-        .btn-warning {
-            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        /* Primary – gold (matches dashboard .btn-primary) */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
             color: white;
-            border: 2px solid transparent;
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
         }
 
-        .btn-warning:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(237, 137, 54, 0.4);
-            filter: brightness(1.1);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
         }
 
+        /* Success – green (matches dashboard .btn-success) */
         .btn-success {
-            background: linear-gradient(135deg, #48bb78, #38a169);
+            background: linear-gradient(135deg, #27ae60, #1e8449);
             color: white;
-            border: 2px solid transparent;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
         }
 
         .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(72, 187, 120, 0.4);
-            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
         }
 
+        /* Warning – orange (matches dashboard .btn-warning) */
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #d68910);
+            color: white;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        /* Secondary – outlined */
         .btn-secondary {
-            background: transparent;
-            color: #718096;
-            border: 2px solid #e2e8f0;
+            background: rgba(250, 247, 240, 0.9);
+            color: var(--navy-medium);
+            border: 2px solid rgba(200, 160, 98, 0.4);
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-secondary:hover {
-            background: #f7fafc;
-            border-color: #cbd5e0;
-            color: #4a5568;
+            background: var(--cream-dark);
+            border-color: var(--gold-primary);
+            color: var(--navy-deep);
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(200, 160, 98, 0.25);
         }
 
-        /* Floating Elements */
-        .floating-shape {
-            position: fixed;
-            opacity: 0.05;
+        /* ─── Button Row ─── */
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(200, 160, 98, 0.15);
+        }
+
+        /* ─── Loading state ─── */
+        .btn.loading {
             pointer-events: none;
-            animation: float 6s ease-in-out infinite;
-            z-index: 1;
+            opacity: 0.7;
         }
 
-        .floating-shape:nth-child(1) {
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%; right: 14px;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            transform: translateY(-50%);
         }
 
-        .floating-shape:nth-child(2) {
-            top: 60%;
-            right: 15%;
-            animation-delay: 2s;
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
         }
 
-        .floating-shape:nth-child(3) {
-            bottom: 20%;
-            left: 20%;
-            animation-delay: 4s;
-        }
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar         { width: 6px; }
+        ::-webkit-scrollbar-track   { background: rgba(250, 247, 240, 0.3); }
+        ::-webkit-scrollbar-thumb   { background: rgba(200, 160, 98, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(200, 160, 98, 0.5); }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-
-        /* Responsive Design */
+        /* ─── Responsive ─── */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
             .quiz-container {
-                margin: 20px 10px;
-                padding: 2rem;
+                padding: 28px 20px 24px;
             }
 
             .quiz-header h2 {
-                font-size: 2rem;
+                font-size: 1.35rem;
             }
 
-            .main-content {
-                padding-top: 80px;
+            body { padding: 10px; }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
             }
 
-            body {
-                padding: 10px;
+            .shared-fields {
+                grid-template-columns: 1fr;
             }
 
-            .btn {
+            .button-row {
+                flex-direction: column;
+            }
+
+            .button-row .btn {
                 width: 100%;
-                margin: 0.5rem 0;
             }
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 4px;
-        }
-
-        /* Form validation states */
-        .form-control:valid {
-            border-color: #48bb78;
-        }
-
-        .form-control:invalid:not(:placeholder-shown) {
-            border-color: #f56565;
-        }
-
-        /* Animation for new question blocks */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .question-block-new {
-            animation: slideIn 0.5s ease-out;
         }
     </style>
+
     <script>
         function addQuestionBlock() {
             const container = document.getElementById('questions-container');
             const index = container.children.length + 1;
             const html = `
-                <div class="border p-3 mb-4 question-block-new">
-                    <h5>Question ${index}</h5>
-                    <textarea name="question" placeholder="Question" class="form-control my-2" required></textarea>
-                    <input type="text" name="a" placeholder="Option A" class="form-control my-2" required>
-                    <input type="text" name="b" placeholder="Option B" class="form-control my-2" required>
-                    <input type="text" name="c" placeholder="Option C" class="form-control my-2" required>
-                    <input type="text" name="d" placeholder="Option D" class="form-control my-2" required>
-                    <input type="text" name="correct" placeholder="Correct Option (A/B/C/D)" class="form-control my-2" required>
+                <div class="question-block question-block-new">
+                    <h5><span class="q-badge">${index}</span> Question ${index}</h5>
+                    <label class="form-label">Question</label>
+                    <textarea name="question" placeholder="Type your question here…" class="form-control" required></textarea>
+                    <div class="options-grid">
+                        <div class="option-wrap">
+                            <label class="form-label">Option A</label>
+                            <input type="text" name="a" placeholder="Option A" class="form-control" required>
+                        </div>
+                        <div class="option-wrap">
+                            <label class="form-label">Option B</label>
+                            <input type="text" name="b" placeholder="Option B" class="form-control" required>
+                        </div>
+                        <div class="option-wrap">
+                            <label class="form-label">Option C</label>
+                            <input type="text" name="c" placeholder="Option C" class="form-control" required>
+                        </div>
+                        <div class="option-wrap">
+                            <label class="form-label">Option D</label>
+                            <input type="text" name="d" placeholder="Option D" class="form-control" required>
+                        </div>
+                    </div>
+                    <label class="form-label" style="margin-top:4px;">Correct Answer</label>
+                    <input type="text" name="correct" placeholder="A / B / C / D" class="form-control" required>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
         }
     </script>
 </head>
-<body class="p-4">
-    <!-- Floating background elements -->
-    <div class="floating-shape">
-        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="40" fill="white" opacity="0.1"/>
-        </svg>
-    </div>
-    <div class="floating-shape">
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect x="20" y="20" width="40" height="40" fill="white" opacity="0.1" rx="8"/>
-        </svg>
-    </div>
-    <div class="floating-shape">
-        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-            <polygon points="60,20 80,70 40,70" fill="white" opacity="0.1"/>
-        </svg>
-    </div>
-
-    <!-- Header -->
-    <header>
-        <nav>
-            <a href="#" class="logo">NeoLearn</a>
-            <ul class="nav-links">
-                <li><a href="#dashboard">Dashboard</a></li>
-                <li><a href="#quizzes">Quizzes</a></li>
-                <li><a href="#students">Students</a></li>
-                <li><a href="#analytics">Analytics</a></li>
-            </ul>
-        </nav>
-    </header>
+<body>
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="container">
             <div class="quiz-container">
+
+                <!-- Header with accent bar -->
                 <div class="quiz-header">
-                    <h2>📝 Create Quiz</h2>
-                    <p>Design engaging quizzes for your students with multiple choice questions</p>
+                    <div class="title-accent"></div>
+                    <div>
+                        <h2>📝 Create Quiz</h2>
+                        <!-- <p>Design engaging quizzes for your students with multiple choice questions</p> -->
+                    </div>
                 </div>
 
-                <form method="post">
+                <form method="post" id="quizForm">
                     <div id="questions-container">
                         <!-- Initial question block -->
-                        <div class="border p-3 mb-4">
-                            <h5>Question 1</h5>
-                            <textarea name="question" placeholder="Question" class="form-control my-2" required></textarea>
-                            <input type="text" name="a" placeholder="Option A" class="form-control my-2" required>
-                            <input type="text" name="b" placeholder="Option B" class="form-control my-2" required>
-                            <input type="text" name="c" placeholder="Option C" class="form-control my-2" required>
-                            <input type="text" name="d" placeholder="Option D" class="form-control my-2" required>
-                            <input type="text" name="correct" placeholder="Correct Option (A/B/C/D)" class="form-control my-2" required>
+                        <div class="question-block">
+                            <h5><span class="q-badge">1</span> Question 1</h5>
+                            <label class="form-label">Question</label>
+                            <textarea name="question" placeholder="Type your question here…" class="form-control" required></textarea>
+                            <div class="options-grid">
+                                <div class="option-wrap">
+                                    <label class="form-label">Option A</label>
+                                    <input type="text" name="a" placeholder="Option A" class="form-control" required>
+                                </div>
+                                <div class="option-wrap">
+                                    <label class="form-label">Option B</label>
+                                    <input type="text" name="b" placeholder="Option B" class="form-control" required>
+                                </div>
+                                <div class="option-wrap">
+                                    <label class="form-label">Option C</label>
+                                    <input type="text" name="c" placeholder="Option C" class="form-control" required>
+                                </div>
+                                <div class="option-wrap">
+                                    <label class="form-label">Option D</label>
+                                    <input type="text" name="d" placeholder="Option D" class="form-control" required>
+                                </div>
+                            </div>
+                            <label class="form-label" style="margin-top:4px;">Correct Answer</label>
+                            <input type="text" name="correct" placeholder="A / B / C / D" class="form-control" required>
                         </div>
                     </div>
-                    <!-- Shared info -->
-                    <input type="text" name="subject" placeholder="Subject" class="form-control my-2" required>
-                    <input type="text" name="standard" placeholder="Standard" class="form-control my-2" required>
-                    <button type="button" class="btn btn-warning mb-3" onclick="addQuestionBlock()">➕ Add Another Question</button>
-                    <br>
-                    <button type="submit" class="btn btn-success">✅ Submit All Questions</button>
-                    <a href="/teacher" class="btn btn-secondary mt-3">← Back</a>
+
+                    <!-- Subject & Standard -->
+                    <div class="shared-fields">
+                        <div>
+                            <label class="form-label">Subject</label>
+                            <input type="text" name="subject" placeholder="e.g. Mathematics" class="form-control" required>
+                        </div>
+                        <div>
+                            <label class="form-label">Standard</label>
+                            <input type="text" name="standard" placeholder="e.g. 10th Standard" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="button-row">
+                        <button type="button" class="btn btn-warning" onclick="addQuestionBlock()">➕ Add Question</button>
+                        <button type="submit" class="btn btn-success" id="submitBtn">✅ Submit Quiz</button>
+                        <a href="/teacher" class="btn btn-secondary">← Back</a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('header');
-            if (window.scrollY > 50) {
-                header.style.background = 'rgba(255, 255, 255, 0.98)';
-                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-            } else {
-                header.style.background = 'rgba(255, 255, 255, 0.95)';
-                header.style.boxShadow = 'none';
-            }
-        });
-
-        // Form validation enhancements
-        const formInputs = document.querySelectorAll('.form-control');
-        formInputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.style.transform = 'translateY(-2px)';
-            });
-            
-            input.addEventListener('blur', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Smooth animations on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const quizContainer = document.querySelector('.quiz-container');
-            quizContainer.style.opacity = '0';
-            quizContainer.style.transform = 'translateY(30px)';
-            
-            setTimeout(() => {
-                quizContainer.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                quizContainer.style.opacity = '1';
-                quizContainer.style.transform = 'translateY(0)';
-            }, 100);
+        // Submit loading state
+        document.getElementById('quizForm').addEventListener('submit', function () {
+            const btn = document.getElementById('submitBtn');
+            btn.classList.add('loading');
         });
     </script>
 </body>

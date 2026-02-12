@@ -1,586 +1,1461 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Dashboard</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - NeoLearn Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
-      color: #2d3748;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 2rem;
-    }
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      position: relative;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    /* Floating Elements */
-    .container::before {
-      content: '';
-      position: absolute;
-      top: 10%;
-      left: 5%;
-      width: 100px;
-      height: 100px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      animation: float 6s ease-in-out infinite;
-      pointer-events: none;
-    }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-    .container::after {
-      content: '';
-      position: absolute;
-      top: 60%;
-      right: 10%;
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      animation: float 6s ease-in-out infinite 2s;
-      pointer-events: none;
-    }
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(26, 50, 80, 0.95) 0%, rgba(11, 29, 53, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            padding: 0;
+            overflow: hidden;
+            z-index: 1000;
+            border-right: 1px solid rgba(200, 160, 98, 0.15);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(5deg); }
-    }
+        .sidebar-header {
+            padding: 32px 24px 24px;
+            border-bottom: 1px solid rgba(200, 160, 98, 0.15);
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
 
-    /* Header */
-    h2 {
-      font-size: 3rem;
-      font-weight: 800;
-      margin-bottom: 2rem;
-      text-align: center;
-      color: white;
-      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
 
-    /* Flash Messages */
-    .alert {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(102, 126, 234, 0.2);
-      border-radius: 15px;
-      padding: 1rem 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      color: #2d3748;
-      font-weight: 500;
-    }
+        .logo-mini {
+            width: 42px;
+            height: 42px;
+            filter: drop-shadow(0 2px 8px rgba(200, 160, 98, 0.4));
+        }
 
-    /* Grid Layout */
-    .row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
+        .sidebar-header h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
 
-    .g-4 {
-      gap: 2rem;
-    }
+        .sidebar-subtitle {
+            color: rgba(250, 247, 240, 0.5);
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
 
-    /* Cards */
-    .card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
+        .sidebar-menu {
+            list-style: none;
+            padding: 16px 16px 16px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
-    }
+        .sidebar-menu::-webkit-scrollbar {
+            width: 6px;
+        }
 
-    .shadow {
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-    }
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(11, 29, 53, 0.3);
+        }
 
-    .border-0 {
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(200, 160, 98, 0.3);
+            border-radius: 3px;
+        }
 
-    .card-header {
-      padding: 1.5rem 2rem 1rem;
-      font-weight: 700;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-bottom: none;
-    }
+        .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(200, 160, 98, 0.5);
+        }
 
-    .bg-primary {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-    }
+        .menu-section-title {
+            color: rgba(250, 247, 240, 0.4);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 20px 12px 8px;
+            margin-top: 4px;
+        }
 
-    .bg-success {
-      background: linear-gradient(135deg, #48bb78, #38a169);
-      color: white;
-    }
+        .menu-section-title:first-child {
+            margin-top: 0;
+            padding-top: 0;
+        }
 
-    .bg-warning {
-      background: linear-gradient(135deg, #ed8936, #dd6b20);
-      color: white;
-    }
+        .sidebar-menu li {
+            margin: 4px 0;
+        }
 
-    .bg-dark {
-      background: linear-gradient(135deg, #2d3748, #1a202c);
-      color: white;
-    }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: rgba(250, 247, 240, 0.7);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .bg-info {
-      background: linear-gradient(135deg, #4299e1, #3182ce);
-      color: white;
-    }
+        .sidebar-menu a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+            transform: scaleY(0);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .text-white {
-      color: white;
-    }
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(200, 160, 98, 0.12);
+            color: var(--gold-light);
+            transform: translateX(4px);
+        }
 
-    .text-dark {
-      color: white;
-    }
+        .sidebar-menu a:hover::before,
+        .sidebar-menu a.active::before {
+            transform: scaleY(1);
+        }
 
-    .card-body {
-      padding: 2rem;
-    }
+        .sidebar-menu a.active {
+            background: rgba(200, 160, 98, 0.18);
+            color: var(--gold-primary);
+            font-weight: 600;
+        }
 
-    /* Form Elements */
-    .mb-2, .mb-3 {
-      margin-bottom: 1.5rem;
-    }
+        .sidebar-menu a .menu-icon {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
 
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #4a5568;
-    }
+        .sidebar-menu a:hover .menu-icon {
+            transform: scale(1.1);
+        }
 
-    .form-control, .form-select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      background: white;
-    }
+        .sidebar-logout {
+            flex-shrink: 0;
+            padding: 16px;
+            background: linear-gradient(180deg, rgba(11, 29, 53, 0.5) 0%, rgba(11, 29, 53, 0.98) 100%);
+            border-top: 1px solid rgba(200, 160, 98, 0.15);
+        }
 
-    .form-control:focus, .form-select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
+        .logout-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.85), rgba(192, 57, 43, 0.85));
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+        }
 
-    textarea.form-control {
-      resize: vertical;
-      min-height: 100px;
-    }
+        .logout-link:hover {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 1), rgba(192, 57, 43, 1));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(231, 76, 60, 0.4);
+        }
 
-    /* Buttons */
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
+        .logout-link .menu-icon {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-    }
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
 
-    .btn-success {
-      background: linear-gradient(135deg, #48bb78, #38a169);
-      color: white;
-    }
+        .top-bar {
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 24px 32px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 32px;
+            border: 1px solid rgba(200, 160, 98, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-    .btn-warning {
-      background: linear-gradient(135deg, #ed8936, #dd6b20);
-      color: white;
-    }
+        .top-bar h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.65rem;
+            color: var(--navy-deep);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .btn-dark {
-      background: linear-gradient(135deg, #2d3748, #1a202c);
-      color: white;
-    }
+        .title-accent {
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+            border-radius: 2px;
+        }
 
-    .btn-info {
-      background: linear-gradient(135deg, #4299e1, #3182ce);
-      color: white;
-    }
+        /* Content Sections */
+        .content-section {
+            display: none;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .btn-danger {
-      background: linear-gradient(135deg, #e53e3e, #c53030);
-      color: white;
-    }
+        .content-section.active {
+            display: block;
+        }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      filter: brightness(1.1);
-    }
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
 
-    .w-100 {
-      width: 100%;
-    }
+        /* Cards */
+        .card {
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            border: 1px solid rgba(200, 160, 98, 0.12);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-    /* Data Sections */
-    .mt-5, .mt-4 {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 2rem;
-      margin-top: 2rem;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
 
-    h4 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #2d3748;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
 
-    /* Tables */
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
+        .card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+        }
 
-    .table th,
-    .table td {
-      padding: 1rem;
-      text-align: left;
-      border-bottom: 1px solid #e2e8f0;
-    }
+        .card-header {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(200, 160, 98, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .table th {
-      background: linear-gradient(135deg, #f7fafc, #edf2f7);
-      font-weight: 600;
-      color: #2d3748;
-    }
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
 
-    .table-bordered {
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      overflow: hidden;
-    }
+        .stat-card {
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid rgba(200, 160, 98, 0.15);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .table-striped tbody tr:nth-child(even) {
-      background: rgba(102, 126, 234, 0.02);
-    }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(200, 160, 98, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
 
-    .table tbody tr:hover {
-      background: rgba(102, 126, 234, 0.05);
-    }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(200, 160, 98, 0.3);
+        }
 
-    /* Lists */
-    .list-group {
-      list-style: none;
-      padding: 0;
-    }
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
 
-    .list-group-item {
-      background: white;
-      border: 1px solid #e2e8f0;
-      padding: 1rem 1.5rem;
-      margin-bottom: 0.5rem;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-    }
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin-bottom: 4px;
+        }
 
-    .list-group-item:hover {
-      background: rgba(102, 126, 234, 0.05);
-      border-color: #667eea;
-    }
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(11, 29, 53, 0.6);
+            font-weight: 500;
+        }
 
-    /* Utility Classes */
-    .text-end {
-      text-align: right;
-    }
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    /* Column classes for special sections */
-    .col-md-6 {
-      display: block;
-    }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--navy-medium);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
 
-    .col-lg-3, .col-lg-4 {
-      display: block;
-    }
+        .form-control, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(200, 160, 98, 0.25);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: rgba(250, 247, 240, 0.5);
+            color: var(--navy-deep);
+            font-family: 'Inter', sans-serif;
+        }
 
-    /* Student Voting History Card */
-    .card .card-header.bg-info + .card-body {
-      text-align: center;
-    }
+        .form-control::placeholder {
+            color: rgba(11, 29, 53, 0.4);
+        }
 
-    .card .card-header.bg-info + .card-body .btn {
-      margin-top: 1rem;
-    }
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: rgba(250, 247, 240, 0.9);
+            box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.12);
+        }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
 
-      .row {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
 
-      h2 {
-        font-size: 2rem;
-      }
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+        }
 
-      .card-body {
-        padding: 1.5rem;
-      }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
 
-      .mt-5, .mt-4 {
-        padding: 1.5rem;
-      }
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
 
-      .table {
-        font-size: 0.9rem;
-      }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
+        }
 
-      .table th,
-      .table td {
-        padding: 0.75rem;
-      }
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
+        }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #1e8449);
+            color: white;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
 
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
 
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border-radius: 4px;
-    }
-  </style>
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #d68910);
+            color: white;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        /* Calendar Styles */
+        .calendar-container {
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(200, 160, 98, 0.12);
+            margin-top: 24px;
+        }
+
+        #calendar {
+            background: transparent;
+        }
+
+        .fc {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .fc-button {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 8px 16px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .fc-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.4) !important;
+        }
+
+        .fc-daygrid-day:hover {
+            background: rgba(200, 160, 98, 0.08);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+
+            .main-content {
+                margin-left: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .top-bar {
+                padding: 20px;
+            }
+
+            .top-bar h1 {
+                font-size: 1.35rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading State */
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            transform: translateY(-50%);
+        }
+
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* Success/Error Messages */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-left: 4px solid;
+            animation: slideInDown 0.4s ease;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #1e8449;
+            border-color: #27ae60;
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+            border-color: #e74c3c;
+        }
+
+        /* Activity List Styles */
+        .activity-list {
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .activity-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .activity-list::-webkit-scrollbar-track {
+            background: rgba(200, 160, 98, 0.05);
+            border-radius: 10px;
+        }
+
+        .activity-list::-webkit-scrollbar-thumb {
+            background: rgba(200, 160, 98, 0.2);
+            border-radius: 10px;
+        }
+
+        .activity-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(200, 160, 98, 0.3);
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(200, 160, 98, 0.08);
+            background: rgba(250, 247, 240, 0.3);
+        }
+
+        .activity-item:hover {
+            background: rgba(200, 160, 98, 0.12);
+            border-color: rgba(200, 160, 98, 0.2);
+            transform: translateX(4px);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .msg-icon {
+            background: rgba(52, 152, 219, 0.15);
+        }
+
+        .event-icon {
+            background: rgba(243, 156, 18, 0.15);
+        }
+
+        .vote-icon {
+            background: rgba(155, 89, 182, 0.15);
+        }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--navy-deep);
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .activity-meta {
+            font-size: 0.75rem;
+            color: rgba(11, 29, 53, 0.5);
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            color: rgba(11, 29, 53, 0.5);
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        .card-footer {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(200, 160, 98, 0.15);
+            text-align: center;
+        }
+
+        .view-all-link {
+            color: var(--gold-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .view-all-link:hover {
+            color: var(--gold-dark);
+            transform: translateX(4px);
+        }
+
+        /* Message History Styles */
+        .message-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message-history::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .message-history::-webkit-scrollbar-track {
+            background: rgba(200, 160, 98, 0.05);
+            border-radius: 10px;
+        }
+
+        .message-history::-webkit-scrollbar-thumb {
+            background: rgba(200, 160, 98, 0.2);
+            border-radius: 10px;
+        }
+
+        .history-item {
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--gold-primary);
+            background: rgba(200, 160, 98, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(200, 160, 98, 0.1);
+            transform: translateX(4px);
+        }
+
+        .history-label {
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .history-text {
+            color: rgba(11, 29, 53, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Voting Results Table */
+        .voting-results {
+            overflow-x: auto;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table thead {
+            background: linear-gradient(135deg, rgba(200, 160, 98, 0.15), rgba(200, 160, 98, 0.08));
+        }
+
+        .results-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--navy-deep);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(200, 160, 98, 0.2);
+        }
+
+        .results-table td {
+            padding: 14px 16px;
+            color: rgba(11, 29, 53, 0.85);
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(200, 160, 98, 0.1);
+        }
+
+        .results-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .results-table tbody tr:hover {
+            background: rgba(200, 160, 98, 0.08);
+        }
+
+        .vote-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        /* Message Audience Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.badge-student {
+    background: rgba(52, 152, 219, 0.15);
+    color: #2980b9;
+}
+
+.badge-teacher {
+    background: rgba(155, 89, 182, 0.15);
+    color: #8e44ad;
+}
+
+.badge-all {
+    background: rgba(39, 174, 96, 0.15);
+    color: #1e8449;
+}
+.tabs {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+.tab-btn {
+    padding: 6px 14px;
+    border: none;
+    cursor: pointer;
+    background: #eee;
+    border-radius: 6px;
+}
+
+.tab-btn.active {
+    background: #1e3a8a;
+    color: white;
+}
+
+.message-item {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.badge-student { background: #dbeafe; }
+.badge-teacher { background: #ede9fe; }
+.badge-all     { background: #dcfce7; }
+
+    </style>
 </head>
-<body class="p-4">
-  <div class="container">
-    <h2 class="mb-4">🛠️ Admin Dashboard</h2>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <svg class="logo-mini" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#C8A062"/>
+                            <stop offset="50%" stop-color="#E6D5B8"/>
+                            <stop offset="100%" stop-color="#9B7E4F"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="45" y="50" width="22" height="100" rx="11" fill="url(#mainGradient)"/>
+                    <rect x="133" y="50" width="22" height="100" rx="11" fill="url(#mainGradient)"/>
+                    <path d="M67 50 L133 150 L133 130 L85 60 Z" fill="url(#mainGradient)"/>
+                </svg>
+                <div>
+                    <h2>NeoLearn</h2>
+                    <div class="sidebar-subtitle">ADMIN PANEL</div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-info">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+        <ul class="sidebar-menu">
+            <li class="menu-section-title">Main</li>
+            <li><a href="#" class="menu-link active" data-section="overview">
+                <span class="menu-icon">📊</span> Dashboard
+            </a></li>
+            
+            <li class="menu-section-title">Management</li>
+            <li><a href="#" class="menu-link" data-section="register">
+                <span class="menu-icon">👤</span> Register User
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="message">
+                <span class="menu-icon">💬</span> Send Message
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="voting">
+                <span class="menu-icon">🗳️</span> Create Voting
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="delete-vote">
+                <span class="menu-icon">🗑️</span> Delete Vote
+            </a></li>
+            
+            <li class="menu-section-title">Schedule</li>
+            <li><a href="#" class="menu-link" data-section="calendar">
+                <span class="menu-icon">📅</span> Calendar
+            </a></li>
+            
+            <li class="menu-section-title">Reports</li>
+            <li><a href="#" class="menu-link" data-section="history">
+                <span class="menu-icon">📋</span> Vote History
+            </a></li>
 
-    <div class="row g-4">
-      <!-- Register New User -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card shadow border-0">
-          <div class="card-header bg-primary text-white">➕ Register User</div>
-          <div class="card-body">
-            <form method="POST" action="{{ url_for('admin_register') }}">
-              <div class="mb-2">
-                <label class="form-label">Username:</label>
-                <input type="text" name="username" class="form-control" required>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Password:</label>
-                <input type="password" name="password" class="form-control" required>
-              </div>
-              <div class="mb-2">
-  <label class="form-label">Role:</label>
-  <select name="role" class="form-select" id="roleSelect" required>
-    <option value="teacher">👨‍🏫 Teacher</option>
-    <option value="student">👨‍🎓 Student</option>
-  </select>
+<li class="nav-item">
+    <a href="{{ url_for('admin_recent_messages') }}" class="nav-link">
+        📩 Recent Messages
+    </a>
+</li>
+
+
+        </ul>
+
+        <div class="sidebar-logout">
+            <a href="{{ url_for('logout') }}" class="logout-link">
+    <span class="menu-icon">🚪</span>
+    Logout
+</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <h1>
+                <div class="title-accent"></div>
+                <span id="page-title">Dashboard Overview</span>
+            </h1>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="content-section active" id="overview">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👨‍🏫</div>
+                    <div class="stat-value">{{ teachers|length }}</div>
+                    <div class="stat-label">Total Teachers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👨‍🎓</div>
+                    <div class="stat-value">{{ students|length }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🗳️</div>
+                    <div class="stat-value">{{ votes|length }}</div>
+                    <div class="stat-label">Active Votes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value">{{ events|length }}</div>
+                    <div class="stat-label">Upcoming Events</div>
+                </div>
+            </div>
+
+<!-- Recent Messages Section -->
+<div class="content-section" id="recent-messages">
+    <div class="card">
+        <div class="card-header">📨 Recent Messages</div>
+
+        <!-- Filter Buttons -->
+        <div style="margin-bottom:16px;">
+            <button class="btn btn-sm btn-info" onclick="filterMessages('all')">All</button>
+            <button class="btn btn-sm btn-primary" onclick="filterMessages('student')">Students</button>
+            <button class="btn btn-sm btn-warning" onclick="filterMessages('teacher')">Teachers</button>
+        </div>
+
+        <!-- Messages List -->
+        <div class="message-history">
+            {% if messages %}
+                {% for msg in messages %}
+                <div class="history-item message-item"
+                     data-audience="{{ msg[1] }}">
+
+                    <div class="history-label">
+                        To
+                        {% if msg[1] == 'student' %}
+                            <span class="badge badge-student">Students</span>
+                        {% elif msg[1] == 'teacher' %}
+                            <span class="badge badge-teacher">Teachers</span>
+                        {% else %}
+                            <span class="badge badge-all">All Users</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="history-text">
+                        {{ msg[0] }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p>No messages sent yet</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
-<div class="mb-2" id="standardField" style="display:none;">
-  <label class="form-label">Standard:</label>
-  <input type="text" name="standard" class="form-control">
+            <!-- Voting Results History -->
+            <div class="card">
+                <div class="card-header">📊 Voting Results</div>
+                <div class="voting-results">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Topic</th>
+                                <th>Option</th>
+                                <th>Votes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+{% if votes %}
+    {% for v in votes %}
+    <tr>
+        <td>{{ v[1] }}</td>   <!-- title -->
+        <td>{{ v[2] }}</td>   <!-- option_text -->
+        <td>{{ v[3] }}</td>   <!-- votes -->
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="3" style="text-align:center; color:#888;">
+            No voting data available
+        </td>
+    </tr>
+{% endif %}
+</tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Vote Section -->
+        <div class="content-section" id="delete-vote">
+            <div class="card">
+                <div class="card-header">🗑️ Delete Vote</div>
+                <form method="POST" action="{{ url_for('delete_vote') }}">
+                    <div class="form-group">
+                        <label class="form-label">Select Vote to Delete:</label>
+                        <select name="vote_title" class="form-select" required>
+                            <option value="">-- Choose Vote Title --</option>
+                            {% for v in votes %}
+                            <option value="{{ v[1] }}">{{ v[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete Vote</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register User Section -->
+        <div class="content-section" id="register">
+            <div class="card">
+                <div class="card-header">➕ Register New User</div>
+                <form method="POST" action="{{ url_for('admin_register') }}">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                    </div>
+                    <div class="form-group">
+    <label class="form-label">Email</label>
+    <input type="email" name="email" class="form-control" placeholder="Enter email" required>
 </div>
 
-              <button type="submit" class="btn btn-primary w-100">Register</button>
-            </form>
-          </div>
-        </div>
-      </div>
+<div class="form-group">
+    <label class="form-label">Mobile</label>
+    <input type="text" name="mobile" class="form-control" placeholder="Enter mobile number" required>
+</div>
 
-      <!-- Send Message -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card shadow border-0">
-          <div class="card-header bg-success text-white">📩 Send Message</div>
-          <div class="card-body">
-            <form method="POST" action="{{ url_for('admin_message') }}">
-              <div class="mb-2">
-                <textarea name="message" class="form-control" placeholder="Enter message" rows="3" required></textarea>
-              </div>
-              <div class="mb-2">
-                <select name="to" class="form-select" required>
-                  <option value="teacher">👩‍🏫 Teachers</option>
-                  <option value="student">👨‍🎓 Students</option>
-                  <option value="all">👥 Both</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-success w-100">Send</button>
-            </form>
-          </div>
-        </div>
-      </div>
+<div class="form-group">
+    <label class="form-label">Date of Birth</label>
+    <input type="date" name="dob" class="form-control" required>
+</div>
 
-      <!-- Classic Voting -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card shadow border-0">
-          <div class="card-header bg-warning text-dark">🗳️ Vote for Best Teacher</div>
-          <div class="card-body">
-            <form method="POST" action="{{ url_for('create_vote') }}">
-              <input type="hidden" name="title" value="Best Teacher Vote">
-              <div class="mb-3">
-                <label class="form-label">Select Teacher:</label>
-                <select name="options" class="form-select" required>
-                  <option value="">-- Choose --</option>
-                  {% for t in teachers %}
-                    <option value="{{ t }}">{{ t }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <button type="submit" class="btn btn-warning w-100">Start Vote</button>
-            </form>
-          </div>
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select name="role" class="form-select" id="roleSelect" required>
+                            <option value="teacher">👨‍🏫 Teacher</option>
+                            <option value="student">👨‍🎓 Student</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="standardField" style="display:none;">
+                        <label class="form-label">Standard</label>
+                        <input type="text" name="standard" class="form-control" placeholder="Enter standard">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register User</button>
+                </form>
+            </div>
         </div>
-      </div>
 
-      <!-- Custom Voting -->
-      <div class="col-md-6 col-lg-3">
-        <div class="card shadow border-0">
-          <div class="card-header bg-dark text-white">📝 Custom Voting</div>
-          <div class="card-body">
-            <form method="POST" action="{{ url_for('create_vote') }}">
-              <div class="mb-2">
-                <label class="form-label">Vote Title:</label>
-                <input type="text" name="title" class="form-control" placeholder="e.g. Who is best?" required>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Options (comma separated):</label>
-                <input type="text" name="options" class="form-control" placeholder="e.g. Parth, khushi, mahira" required>
-              </div>
-              <button type="submit" class="btn btn-dark w-100">Start Custom Vote</button>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Student Voting History -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card shadow border-0">
-          <div class="card-header bg-info text-white">📋 View Student Voting History</div>
-          <div class="card-body text-center">
-            <a href="{{ url_for('view_student_votes') }}" class="btn btn-info w-100">View History</a>
-          </div>
-        </div>
-      </div>
+        <!-- Send Message Section -->
+        <div class="content-section" id="message">
+            <div class="card">
+                <div class="card-header">📩 Send Message</div>
+<form method="POST" action="{{ url_for('admin_message') }}">
+    
+    <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea name="message" class="form-control" required></textarea>
     </div>
 
-    <!-- Messages List -->
-    <div class="mt-5">
-      <h4>📨 Messages</h4>
-      <ul class="list-group">
-        {% for m in messages %}
-          <li class="list-group-item"><strong>To {{ m[2]|capitalize }}:</strong> {{ m[1] }}</li>
-        {% endfor %}
-      </ul>
+    <div class="form-group">
+        <label class="form-label">Send To</label>
+        <select name="recipient" class="form-select" required>
+            <option value="student">Students</option>
+            <option value="teacher">Teachers</option>
+            <option value="all">All</option>
+        </select>
     </div>
 
-    <!-- Voting Results -->
-    <div class="mt-4">
-      <h4>📊 Voting Results</h4>
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr><th>Topic</th><th>Option</th><th>Votes</th></tr>
-        </thead>
-        <tbody>
-          {% for v in votes %}
-          <tr>
-            <td>{{ v[1] }}</td>  <!-- title -->
-            <td>{{ v[2] }}</td>  <!-- option_text -->
-            <td>{{ v[3] }}</td>  <!-- votes -->
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <button type="submit" class="btn btn-success w-100">
+        Send Message
+    </button>
 
-    <!-- Delete Vote Section -->
-    <div class="mt-5">
-      <h4>🗑️ Delete Vote</h4>
-      <form action="{{ url_for('delete_vote') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this vote?');">
-        <div class="mb-3">
-          <label class="form-label">Select Vote Title:</label>
-          <select name="title" class="form-select" required>
-            <option value="">-- Choose Vote Title --</option>
-            {% for v in votes %}
-              <option value="{{ v[1] }}">{{ v[1] }}</option>
-            {% endfor %}
-          </select>
+</form>
+
+            </div>
         </div>
-        <button type="submit" class="btn btn-danger">Delete Vote</button>
-      </form>
+
+        <!-- Voting Section -->
+        <div class="content-section" id="voting">
+            <div class="form-grid">
+                <div class="card">
+                    <div class="card-header">🗳️ Best Teacher Vote</div>
+                    <form method="POST" action="{{ url_for('create_vote') }}">
+                        <input type="hidden" name="title" value="Best Teacher Vote">
+                        <div class="form-group">
+                            <label class="form-label">Select Teacher</label>
+                            <select name="options" class="form-select" required>
+                                <option value="">-- Choose Teacher --</option>
+                                {% for t in teachers %}
+                                <option value="{{ t }}">{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">Start Vote</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">📝 Custom Voting</div>
+                    <form method="POST" action="{{ url_for('create_vote') }}">
+                        <div class="form-group">
+                            <label class="form-label">Vote Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="e.g. Best Student" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Options (comma separated)</label>
+                            <input type="text" name="options" class="form-control" placeholder="e.g. John, Jane, Bob" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Create Vote</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="content-section" id="calendar">
+            <div class="card">
+                <div class="card-header">📅 Add Event</div>
+                <form action="{{ url_for('create_event') }}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Event Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="Enter event title" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="end_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Event description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Audience</label>
+                        <select name="audience" class="form-select" required>
+                            <option value="">Select Audience</option>
+                            <option value="teacher">Teacher Only</option>
+                            <option value="student">Student Only</option>
+                            <option value="both">Teacher & Student</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Add Event</button>
+                </form>
+            </div>
+
+            <div class="calendar-container">
+                <div id="calendar"></div>
+            </div>
+        </div>
+
+<!-- Vote History Section -->
+<div class="content-section" id="history">
+    <div class="card">
+        <div class="card-header">📋 Student Voting History</div>
+
+        <div style="text-align:center; padding:20px;">
+            <a href="{{ url_for('view_student_votes') }}"
+               class="btn btn-primary">
+                View Student Voting History
+            </a>
+        </div>
     </div>
+</div>
 
-    <div class="text-end mt-4">
-      <a href="/logout" class="btn btn-danger">Logout</a>
-    </div>
 
-  </div>
-  <script>
-document.getElementById('roleSelect').addEventListener('change', function() {
-  const selectedRole = this.value;
-  const standardField = document.getElementById('standardField');
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+    <script>
+        // Navigation System
+        const menuLinks = document.querySelectorAll('.menu-link');
+        const sections = document.querySelectorAll('.content-section');
+        const pageTitle = document.getElementById('page-title');
 
-  if (selectedRole === 'student') {
-    standardField.style.display = 'block';
-  } else {
-    standardField.style.display = 'none';
-  }
-});
+        const titles = {
+            'overview': 'Dashboard Overview',
+            'register': 'Register New User',
+            'message': 'Send Message',
+            'voting': 'Create Voting',
+            'delete-vote': 'Delete Vote',
+            'calendar': 'Academic Calendar',
+            'history': 'Voting History'
+        };
+
+        function navigateTo(sectionId) {
+            menuLinks.forEach(l => l.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+            
+            const targetLink = document.querySelector(`[data-section="${sectionId}"]`);
+            if (targetLink) targetLink.classList.add('active');
+            
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) targetSection.classList.add('active');
+            
+            pageTitle.textContent = titles[sectionId];
+        }
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                navigateTo(sectionId);
+            });
+        });
+
+        // Role Select Handler
+        document.getElementById('roleSelect').addEventListener('change', function() {
+            const standardField = document.getElementById('standardField');
+            if (this.value === 'student') {
+                standardField.style.display = 'block';
+            } else {
+                standardField.style.display = 'none';
+            }
+        });
+
+        // Form Submit Animation
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.classList.add('loading');
+                }
+            });
+        });
+
+        // Input Focus Effects
+        document.querySelectorAll('.form-control, .form-select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.01)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // FullCalendar Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            if (calendarEl) {
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    height: 600,
+                    events: '/get-events',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    eventColor: '#C8A062',
+                    eventBackgroundColor: '#C8A062',
+                    eventBorderColor: '#9B7E4F'
+                });
+                calendar.render();
+            }
+        });
+
+        // Smooth Scroll to Top on Section Change
+        sections.forEach(section => {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.classList.contains('active')) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
+            });
+            observer.observe(section, { attributes: true, attributeFilter: ['class'] });
+        });
+    </script>
+    <script>
+function filterMessages(type) {
+    const items = document.querySelectorAll('.message-item');
+
+    items.forEach(item => {
+        if (type === 'all') {
+            item.style.display = 'block';
+        } else {
+            item.style.display =
+                item.dataset.audience === type ? 'block' : 'none';
+        }
+    });
+}
 </script>
 
 </body>

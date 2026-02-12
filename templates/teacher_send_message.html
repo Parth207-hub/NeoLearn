@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message | NeoLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .main-content {
+            padding: 60px 40px;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(250, 247, 240, 0.98);
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            padding: 40px;
+            border: 1px solid rgba(200, 160, 98, 0.2);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .profile-form-group {
+            margin-bottom: 24px;
+        }
+
+        .profile-label {
+            display: block;
+            font-weight: 600;
+            color: var(--navy-deep);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .profile-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(42, 74, 107, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            color: var(--navy-deep);
+            transition: all 0.3s ease;
+        }
+
+        .profile-input:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.1);
+        }
+
+        .profile-input:hover {
+            border-color: rgba(42, 74, 107, 0.3);
+        }
+
+        select.profile-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230B1D35' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            padding-right: 45px;
+        }
+
+        textarea.profile-input {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(42, 74, 107, 0.1);
+            color: var(--navy-deep);
+            border: 2px solid rgba(42, 74, 107, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(42, 74, 107, 0.15);
+            border-color: rgba(42, 74, 107, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(200, 160, 98, 0.08), rgba(230, 213, 184, 0.08));
+            border-left: 4px solid var(--gold-primary);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .info-box p {
+            color: var(--navy-medium);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .info-box::before {
+            content: 'ℹ️';
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 40px 20px;
+            }
+
+            .card {
+                padding: 28px 20px;
+            }
+
+            .card-title {
+                font-size: 1.6rem;
+                margin-bottom: 24px;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                font-size: 0.95rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-content">
+    <div class="card">
+        <div class="card-title">📢 Send Message (Standard-wise)</div>
+
+        <div class="info-box">
+            <p>This message will be sent to all students in the selected standard.</p>
+        </div>
+
+        <form method="POST">
+            <div class="profile-form-group">
+                <label class="profile-label">Select Standard</label>
+                <select name="standard" class="profile-input" required>
+                    <option value="">-- Choose Standard --</option>
+                    <option value="1">Standard 1</option>
+                    <option value="2">Standard 2</option>
+                    <option value="3">Standard 3</option>
+                    <option value="4">Standard 4</option>
+                    <option value="5">Standard 5</option>
+                    <option value="6">Standard 6</option>
+                    <option value="7">Standard 7</option>
+                    <option value="8">Standard 8</option>
+                    <option value="9">Standard 9</option>
+                    <option value="10">Standard 10</option>
+                    <option value="11">Standard 11</option>
+                    <option value="12">Standard 12</option>
+                </select>
+            </div>
+
+            <div class="profile-form-group">
+                <label class="profile-label">Message</label>
+                <textarea name="message" class="profile-input" rows="4" required placeholder="Type your message here..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">📤 Send Message</button>
+                <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-secondary">⬅️ Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

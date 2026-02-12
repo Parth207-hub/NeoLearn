@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Queries | NeoLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .main-content {
+            padding: 60px 40px;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(250, 247, 240, 0.98);
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            padding: 40px;
+            border: 1px solid rgba(200, 160, 98, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--navy-deep), var(--navy-medium));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .query-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+            border: 2px solid rgba(42, 74, 107, 0.1);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .query-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(200, 160, 98, 0.3);
+        }
+
+        .query-subject {
+            font-weight: 700;
+            color: var(--navy-deep);
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .query-subject::before {
+            content: '📋';
+            font-size: 1.2rem;
+        }
+
+        .query-message {
+            color: var(--navy-medium);
+            line-height: 1.6;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: rgba(250, 247, 240, 0.5);
+            border-radius: 12px;
+            border-left: 3px solid var(--gold-primary);
+        }
+
+        .query-reply {
+            background: linear-gradient(135deg, rgba(200, 160, 98, 0.08), rgba(230, 213, 184, 0.08));
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            border-left: 3px solid var(--gold-primary);
+        }
+
+        .query-reply-label {
+            font-weight: 700;
+            color: var(--gold-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .query-reply-label::before {
+            content: '👨‍🏫';
+        }
+
+        .query-reply-text {
+            color: var(--navy-deep);
+            line-height: 1.6;
+        }
+
+        .waiting-reply {
+            color: #888;
+            font-style: italic;
+            padding: 12px;
+            background: rgba(42, 74, 107, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ccc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .waiting-reply::before {
+            content: '⏳';
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #777;
+        }
+
+        .empty-state::before {
+            content: '📭';
+            display: block;
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            color: var(--navy-medium);
+            opacity: 0.7;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(42, 74, 107, 0.1);
+            color: var(--navy-deep);
+            border: 2px solid rgba(42, 74, 107, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(42, 74, 107, 0.15);
+            border-color: rgba(42, 74, 107, 0.3);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 40px 20px;
+            }
+
+            .card {
+                padding: 28px 20px;
+            }
+
+            .card-title {
+                font-size: 1.6rem;
+            }
+
+            .header-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .button-group {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                padding: 12px 24px;
+                font-size: 0.95rem;
+            }
+
+            .query-card {
+                padding: 20px;
+            }
+
+            .query-subject {
+                font-size: 1.05rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .query-subject::before,
+            .query-reply-label::before,
+            .waiting-reply::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-content">
+    <div class="card">
+        <div class="header-row">
+            <div class="card-title">📨 My Queries</div>
+            <div class="button-group">
+                <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">
+                    ⬅️ Back to Dashboard
+                </a>
+                <a href="{{ url_for('ask_query') }}" class="btn btn-primary">
+                    ➕ Ask New Query
+                </a>
+            </div>
+        </div>
+
+        {% if my_queries %}
+            {% for q in my_queries %}
+            <div class="query-card">
+                <div class="query-subject">{{ q[0] }}</div>
+                <div class="query-message">{{ q[1] }}</div>
+
+                {% if q[2] %}
+                    <div class="query-reply">
+                        <div class="query-reply-label">Teacher Reply:</div>
+                        <div class="query-reply-text">{{ q[2] }}</div>
+                    </div>
+                {% else %}
+                    <div class="waiting-reply">Waiting for reply...</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>You have not asked any queries yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

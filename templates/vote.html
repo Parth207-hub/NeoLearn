@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🗳️ Vote - NeoLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,334 +12,388 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        /* ─── Body ─── */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #2d3748;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
             min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px 20px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        .container::before {
+        /* Ambient radial glows */
+        body::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 2rem;
-            text-align: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 0.75rem;
-            font-size: 1.1rem;
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            background: white;
-            transition: all 0.3s ease;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 1rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5rem;
-            padding-right: 3rem;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .alert {
-            padding: 1.25rem 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            border: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-        }
-
-        .alert-warning {
-            background: linear-gradient(135deg, #ed8936, #dd6b20);
-            color: white;
-            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
-        }
-
-        .alert-info {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
-            color: white;
-            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
-        }
-
-        .vote-section {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }
-
-        .vote-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .form-check {
-            margin-bottom: 1.25rem;
-            padding: 1rem;
-            border-radius: 10px;
-            background: #f8fafc;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .form-check:hover {
-            background: #edf2f7;
-            border-color: rgba(102, 126, 234, 0.2);
-            transform: translateX(5px);
-        }
-
-        .form-check-input {
-            margin-right: 1rem;
-            width: 1.25rem;
-            height: 1.25rem;
-            accent-color: #667eea;
-            cursor: pointer;
-        }
-
-        .form-check-label {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #4a5568;
-            cursor: pointer;
-            flex: 1;
-        }
-
-        .form-check {
-            display: flex;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.1rem;
-            margin-top: 1rem;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            border: 2px solid transparent;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4);
-            filter: brightness(1.1);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .back-button {
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        /* Loading animation for form submission */
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 1rem 0;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Floating decoration elements */
-        .floating-decoration {
-            position: absolute;
-            opacity: 0.05;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
 
-        .floating-decoration:nth-child(1) {
-            top: 10%;
-            right: 10%;
-            animation: float 6s ease-in-out infinite;
+        /* ─── Container ─── */
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
-        .floating-decoration:nth-child(2) {
-            bottom: 15%;
-            left: 15%;
-            animation: float 8s ease-in-out infinite reverse;
+        /* ─── Main Card ─── */
+        .main-card {
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 36px 32px 32px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(200, 160, 98, 0.12);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(3deg); }
+        /* Gold shimmer bar */
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                padding: 25px;
-            }
-
-            .page-title {
-                font-size: 2rem;
-            }
-
-            .vote-section {
-                padding: 1.5rem;
-            }
-
-            .form-check {
-                padding: 0.75rem;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
         }
 
-        /* Enhanced form interactions */
-        .form-check input[type="radio"]:checked + .form-check-label {
-            color: #667eea;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Page Header ─── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .title-accent {
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .page-header h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin: 0;
+        }
+
+        /* ─── Form Group ─── */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--navy-medium);
             font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
         }
 
-        .form-check:has(input[type="radio"]:checked) {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            border-color: #667eea;
+        /* ─── Select Dropdown ─── */
+        .form-select {
+            width: 100%;
+            padding: 12px 42px 12px 16px;
+            border: 2px solid rgba(200, 160, 98, 0.25);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background-color: rgba(250, 247, 240, 0.5);
+            color: var(--navy-deep);
+            font-family: 'Inter', sans-serif;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239B7E4F' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 14px center;
+            background-repeat: no-repeat;
+            background-size: 1.2rem;
+            cursor: pointer;
         }
 
-        /* Success animation */
-        @keyframes successPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .form-select:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background-color: rgba(250, 247, 240, 0.9);
+            box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.12);
+        }
+
+        /* ─── Alerts ─── */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInDown 0.4s ease;
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .alert-success {
-            animation: successPulse 2s ease-in-out;
+            background: rgba(39, 174, 96, 0.1);
+            color: #1e8449;
+            border-left: 4px solid #27ae60;
+        }
+
+        .alert-warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #d68910;
+            border-left: 4px solid #f39c12;
+        }
+
+        .alert-info {
+            background: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+            border-left: 4px solid #3498db;
+        }
+
+        /* ─── Vote Section ─── */
+        .vote-section {
+            background: rgba(250, 247, 240, 0.6);
+            border: 1px solid rgba(200, 160, 98, 0.18);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .vote-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(200, 160, 98, 0.15);
+        }
+
+        /* ─── Radio Option Cards ─── */
+        .form-check {
+            margin-bottom: 12px;
+            padding: 13px 16px;
+            border-radius: 10px;
+            background: rgba(250, 247, 240, 0.5);
+            border: 2px solid rgba(200, 160, 98, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-check:hover {
+            background: rgba(250, 247, 240, 0.85);
+            border-color: rgba(200, 160, 98, 0.4);
+            transform: translateX(4px);
+        }
+
+        .form-check:has(input[type="radio"]:checked) {
+            background: rgba(200, 160, 98, 0.12);
+            border-color: var(--gold-primary);
+            border-left-width: 3px;
+        }
+
+        .form-check-input {
+            margin-right: 14px;
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: var(--gold-primary);
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: rgba(11, 29, 53, 0.85);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .form-check input[type="radio"]:checked + .form-check-label {
+            color: var(--navy-deep);
+            font-weight: 600;
+        }
+
+        /* ─── Buttons ─── */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Ripple */
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #1e8449);
+            color: white;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(250, 247, 240, 0.9);
+            color: var(--navy-medium);
+            border: 2px solid rgba(200, 160, 98, 0.4);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cream-dark);
+            border-color: var(--gold-primary);
+            color: var(--navy-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(200, 160, 98, 0.25);
+        }
+
+        /* ─── Loading Spinner ─── */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        .spinner {
+            border: 3px solid rgba(200, 160, 98, 0.2);
+            border-top: 3px solid var(--gold-primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: rgba(11, 29, 53, 0.5);
+            font-size: 0.82rem;
+        }
+
+        /* ─── Back Button Row ─── */
+        .back-button {
+            margin-top: 24px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(200, 160, 98, 0.15);
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar         { width: 6px; }
+        ::-webkit-scrollbar-track   { background: rgba(250, 247, 240, 0.3); }
+        ::-webkit-scrollbar-thumb   { background: rgba(200, 160, 98, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(200, 160, 98, 0.5); }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 640px) {
+            body { padding: 24px 12px; }
+
+            .main-card { padding: 28px 18px 24px; }
+
+            .page-header h1 { font-size: 1.35rem; }
+
+            .vote-section { padding: 20px; }
+
+            .form-check { padding: 11px 14px; }
+
+            .btn { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <!-- Floating decorations -->
-    <div class="floating-decoration">
-        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="40" fill="currentColor"/>
-        </svg>
-    </div>
-    <div class="floating-decoration">
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect x="20" y="20" width="40" height="40" fill="currentColor" rx="8"/>
-        </svg>
-    </div>
 
-    <div class="container">
-        <h1 class="page-title">
-            <span>🗳️</span>
-            Cast Your Vote
-        </h1>
+<div class="container">
+    <div class="main-card">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div class="title-accent"></div>
+            <h1>🗳️ Cast Your Vote</h1>
+        </div>
 
         <!-- Vote Title Dropdown -->
         <form method="GET" action="{{ url_for('vote') }}" id="titleForm">
             <div class="form-group">
-                <label class="form-label">Select Vote Title:</label>
+                <label class="form-label">Select Vote Title</label>
                 <select name="title" class="form-select" onchange="this.form.submit()">
                     <option value="">-- Choose a voting topic --</option>
                     {% for t in titles %}
@@ -379,7 +434,7 @@
                         </div>
                     {% endfor %}
 
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-success" style="margin-top: 16px;">
                         <span>✅</span>
                         Submit Vote
                     </button>
@@ -387,7 +442,7 @@
 
                 <div class="loading" id="loadingSpinner">
                     <div class="spinner"></div>
-                    <p>Submitting your vote...</p>
+                    <p>Submitting your vote…</p>
                 </div>
             </div>
         {% endif %}
@@ -400,96 +455,89 @@
             </div>
         {% endif %}
 
+        <!-- Back Button -->
         <div class="back-button">
             <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">
                 <span>⬅</span>
                 Back to Dashboard
             </a>
         </div>
+
     </div>
+</div>
 
-    <script>
-        // Enhanced form interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add smooth scrolling
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                alert.style.opacity = '0';
-                alert.style.transform = 'translateY(-20px)';
-                setTimeout(() => {
-                    alert.style.transition = 'all 0.5s ease';
-                    alert.style.opacity = '1';
-                    alert.style.transform = 'translateY(0)';
-                }, 100);
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Staggered alert entrance
+        document.querySelectorAll('.alert').forEach((alert, i) => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-12px)';
+            setTimeout(() => {
+                alert.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+                alert.style.opacity  = '1';
+                alert.style.transform = 'translateY(0)';
+            }, 100 + i * 100);
+        });
+
+        // Form submission loading
+        const voteForm = document.getElementById('voteForm');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        if (voteForm) {
+            voteForm.addEventListener('submit', function () {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.style.display = 'none';
+                loadingSpinner.style.display = 'block';
             });
+        }
 
-            // Form submission loading state
-            const voteForm = document.getElementById('voteForm');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            
-            if (voteForm) {
-                voteForm.addEventListener('submit', function(e) {
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    submitBtn.style.display = 'none';
-                    loadingSpinner.style.display = 'block';
+        // Radio button interactions
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                // Remove previous selection shift
+                document.querySelectorAll('.form-check').forEach(check => {
+                    check.style.transform = 'translateX(0)';
                 });
-            }
-
-            // Radio button interactions
-            const radioButtons = document.querySelectorAll('input[type="radio"]');
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Remove previous selections styling
-                    document.querySelectorAll('.form-check').forEach(check => {
-                        check.style.transform = 'translateX(0)';
-                    });
-                    
-                    // Highlight selected option
-                    this.closest('.form-check').style.transform = 'translateX(10px)';
-                });
-            });
-
-            // Dropdown animation
-            const dropdown = document.querySelector('.form-select');
-            if (dropdown) {
-                dropdown.addEventListener('focus', function() {
-                    this.style.transform = 'scale(1.02)';
-                });
-                
-                dropdown.addEventListener('blur', function() {
-                    this.style.transform = 'scale(1)';
-                });
-            }
-
-            // Add hover effects to form checks
-            const formChecks = document.querySelectorAll('.form-check');
-            formChecks.forEach(check => {
-                check.addEventListener('mouseenter', function() {
-                    if (!this.querySelector('input').checked) {
-                        this.style.background = '#edf2f7';
-                    }
-                });
-                
-                check.addEventListener('mouseleave', function() {
-                    if (!this.querySelector('input').checked) {
-                        this.style.background = '#f8fafc';
-                    }
-                });
+                // Shift selected option
+                this.closest('.form-check').style.transform = 'translateX(8px)';
             });
         });
 
-        // Smooth page transitions
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (this.href && !this.href.includes('#')) {
-                    e.preventDefault();
-                    document.body.style.opacity = '0.8';
-                    setTimeout(() => {
-                        window.location.href = this.href;
-                    }, 200);
+        // Dropdown scale on focus
+        const dropdown = document.querySelector('.form-select');
+        if (dropdown) {
+            dropdown.addEventListener('focus', () => dropdown.style.transform = 'scale(1.015)');
+            dropdown.addEventListener('blur',  () => dropdown.style.transform = 'scale(1)');
+        }
+
+        // Checkbox hover backgrounds
+        document.querySelectorAll('.form-check').forEach(check => {
+            check.addEventListener('mouseenter', function () {
+                if (!this.querySelector('input').checked) {
+                    this.style.background = 'rgba(250, 247, 240, 0.85)';
+                }
+            });
+            
+            check.addEventListener('mouseleave', function () {
+                if (!this.querySelector('input').checked) {
+                    this.style.background = 'rgba(250, 247, 240, 0.5)';
                 }
             });
         });
-    </script>
+    });
+
+    // Fade-out on nav
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function (e) {
+            if (this.href && !this.href.includes('#')) {
+                e.preventDefault();
+                document.querySelector('.main-card').style.opacity = '0.7';
+                document.querySelector('.main-card').style.transition = 'opacity 0.2s';
+                setTimeout(() => { window.location.href = this.href; }, 200);
+            }
+        });
+    });
+</script>
 </body>
 </html>

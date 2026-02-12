@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recent Messages - NeoLearn Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            padding: 40px 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .message-card {
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(200, 160, 98, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .message-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--gold-primary);
+        }
+
+        .message-card strong {
+            color: var(--navy-deep);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .message-to {
+            color: var(--navy-medium);
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: rgba(200, 160, 98, 0.1);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .message-content {
+            color: var(--navy-deep);
+            line-height: 1.6;
+            font-size: 1rem;
+            padding: 12px 0;
+        }
+
+        .no-messages {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--navy-deep);
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--gold-primary);
+        }
+        
+        .no-messages p {
+            margin: 0;
+            color: var(--navy-medium);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--navy-deep);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 30px;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+        }
+
+        .back-link:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .back-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .message-card {
+                padding: 16px;
+            }
+
+            .back-link {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📩 Recent Messages</h2>
+
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="message-card">
+                <div>
+                    <strong>To:</strong>
+                    <div class="message-to">{{ msg[1] }}</div>
+                </div>
+                <div>
+                    <strong>Message:</strong>
+                    <div class="message-content">{{ msg[0] }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-messages">
+            <p>No messages found.</p>
+        </div>
+    {% endif %}
+
+    <div class="back-container">
+        <a href="{{ url_for('admin_dashboard') }}" class="back-link">
+            ⬅ Back to Dashboard
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

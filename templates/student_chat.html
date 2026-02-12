@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chat - NeoLearn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,333 +12,551 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --navy-deep: #0B1D35;
+            --navy-rich: #1A3250;
+            --navy-medium: #2A4A6B;
+            --gold-primary: #C8A062;
+            --gold-light: #E6D5B8;
+            --gold-dark: #9B7E4F;
+            --cream: #FAF7F0;
+            --cream-dark: #F0EAE0;
+            --shadow-sm: 0 2px 8px rgba(11, 29, 53, 0.08);
+            --shadow-md: 0 4px 16px rgba(11, 29, 53, 0.12);
+            --shadow-lg: 0 8px 32px rgba(11, 29, 53, 0.16);
+            --shadow-xl: 0 12px 48px rgba(11, 29, 53, 0.2);
+        }
+
+        /* ─── Body ─── */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #2d3748;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0B1D35 0%, #1A3250 50%, #2A4A6B 100%);
+            background-attachment: fixed;
+            color: var(--navy-deep);
             min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient radial glows */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(200, 160, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(230, 213, 184, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Container ─── */
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── Main Card ─── */
+        .main-card {
+            background: rgba(250, 247, 240, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 36px 32px 32px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(200, 160, 98, 0.12);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Gold shimmer bar */
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Page Header ─── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .title-accent {
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--gold-primary), var(--gold-light));
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .page-header h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 0.82rem;
+            color: rgba(11, 29, 53, 0.5);
+            margin-bottom: 20px;
+            padding-left: 16px;
+        }
+
+        /* ─── System Messages ─── */
+        .system-msg {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            animation: slideInDown 0.4s ease;
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .info {
+            background: rgba(39, 174, 96, 0.1);
+            color: #1e8449;
+            border-left: 4px solid #27ae60;
+        }
+
+        /* ─── Chat Box ─── */
+        .chat-wrapper {
+            margin-top: 16px;
+            margin-bottom: 20px;
+        }
+
+        .chat-box {
+            border-radius: 12px;
+            padding: 16px;
+            background: rgba(250, 247, 240, 0.5);
+            border: 1px solid rgba(200, 160, 98, 0.2);
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        /* Custom scrollbar for chat */
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: rgba(200, 160, 98, 0.08);
+            border-radius: 10px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: rgba(200, 160, 98, 0.25);
+            border-radius: 10px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: rgba(200, 160, 98, 0.4);
+        }
+
+        /* ─── Message Bubbles ─── */
+        .message-row {
+            display: flex;
+            margin: 8px 0;
+        }
+
+        .message {
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 75%;
+            font-size: 0.9rem;
+            position: relative;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-msg {
+            margin-left: auto;
+            background: linear-gradient(135deg, rgba(200, 160, 98, 0.2), rgba(200, 160, 98, 0.15));
+            border: 1px solid rgba(200, 160, 98, 0.3);
+            border-bottom-right-radius: 4px;
+            color: var(--navy-deep);
+        }
+
+        .assistant-msg {
+            margin-right: auto;
+            background: rgba(250, 247, 240, 0.9);
+            border: 1px solid rgba(200, 160, 98, 0.15);
+            border-bottom-left-radius: 4px;
+            color: rgba(11, 29, 53, 0.9);
+        }
+
+        .meta {
+            font-size: 0.72rem;
+            opacity: 0.6;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Empty state */
+        .chat-box p {
+            font-size: 0.88rem;
+            color: rgba(11, 29, 53, 0.4);
+            text-align: center;
             padding: 20px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-
-        h2 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 2rem;
-            text-align: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
+        /* ─── Form Groups ─── */
         .form-group {
-            margin-bottom: 2rem;
+            margin-bottom: 16px;
         }
 
         .form-label {
             display: block;
+            margin-bottom: 8px;
+            color: var(--navy-medium);
             font-weight: 600;
-            margin-bottom: 0.75rem;
-            color: #2d3748;
-            font-size: 1.1rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
         }
 
+        /* ─── Textarea ─── */
         .form-control {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
+            padding: 12px 16px;
+            border: 2px solid rgba(200, 160, 98, 0.25);
+            border-radius: 10px;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
-            background: white;
+            background: rgba(250, 247, 240, 0.5);
+            color: var(--navy-deep);
+            font-family: 'Inter', sans-serif;
             resize: vertical;
-            min-height: 120px;
-            font-family: inherit;
+            min-height: 80px;
+            max-height: 140px;
+        }
+
+        .form-control::placeholder {
+            color: rgba(11, 29, 53, 0.35);
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            transform: translateY(-2px);
+            border-color: var(--gold-primary);
+            background: rgba(250, 247, 240, 0.9);
+            box-shadow: 0 0 0 4px rgba(200, 160, 98, 0.12);
         }
 
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: inline-flex;
+        /* ─── File Input ─── */
+        .file-input-wrapper {
+            display: flex;
+            gap: 12px;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 1.1rem;
-            min-width: 150px;
-            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        input[type="file"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            border: 2px dashed rgba(200, 160, 98, 0.3);
+            border-radius: 10px;
+            background: rgba(250, 247, 240, 0.5);
+            font-size: 0.85rem;
+            color: var(--navy-deep);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: rgba(200, 160, 98, 0.5);
+            background: rgba(250, 247, 240, 0.8);
+        }
+
+        input[type="file"]::file-selector-button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
             color: white;
-            border: 2px solid transparent;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        input[type="file"]::file-selector-button:hover {
             filter: brightness(1.1);
         }
 
-        .btn-secondary {
-            background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
-            margin-top: 1.5rem;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .response-container {
-            margin-top: 2.5rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 15px;
-            border-left: 4px solid #667eea;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        .response-label {
-            font-weight: 700;
-            color: #667eea;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            display: flex;
+        /* ─── Buttons ─── */
+        .btn {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .response-text {
-            color: #4a5568;
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
             justify-content: center;
-            margin-top: 2rem;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 140px;
         }
 
-        /* Floating decoration elements */
-        .floating-shape {
+        /* Ripple */
+        .btn::before {
+            content: '';
             position: absolute;
-            opacity: 0.03;
-            pointer-events: none;
-            animation: float 8s ease-in-out infinite;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
 
-        .floating-shape:nth-child(1) {
-            top: 15%;
-            right: 10%;
-            animation-delay: 0s;
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
         }
 
-        .floating-shape:nth-child(2) {
-            bottom: 20%;
-            left: 5%;
-            animation-delay: 3s;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(200, 160, 98, 0.3);
         }
 
-        @keyframes float {
-            0%, 100% { 
-                transform: translateY(0px) rotate(0deg); 
-            }
-            50% { 
-                transform: translateY(-15px) rotate(3deg); 
-            }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 160, 98, 0.4);
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Loading animation */
         .btn-primary:disabled {
-            background: #a0aec0;
+            background: linear-gradient(135deg, rgba(160, 174, 192, 0.6), rgba(160, 174, 192, 0.5));
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         .btn-primary:disabled:hover {
             transform: none;
             box-shadow: none;
-            filter: none;
         }
 
-        /* Responsive design */
+        .btn-secondary {
+            background: rgba(250, 247, 240, 0.9);
+            color: var(--navy-medium);
+            border: 2px solid rgba(200, 160, 98, 0.4);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cream-dark);
+            border-color: var(--gold-primary);
+            color: var(--navy-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(200, 160, 98, 0.25);
+        }
+
+        /* ─── Button Groups ─── */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(200, 160, 98, 0.15);
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar         { width: 6px; }
+        ::-webkit-scrollbar-track   { background: rgba(250, 247, 240, 0.3); }
+        ::-webkit-scrollbar-thumb   { background: rgba(200, 160, 98, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(200, 160, 98, 0.5); }
+
+        /* ─── Responsive ─── */
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
+            body { padding: 24px 12px; }
 
-            .container {
-                padding: 20px;
-            }
+            .main-card { padding: 28px 18px 24px; }
 
-            h2 {
-                font-size: 2rem;
-            }
+            .page-header h2 { font-size: 1.35rem; }
 
             .button-group {
                 flex-direction: column;
-                align-items: center;
+                align-items: stretch;
             }
 
             .btn {
                 width: 100%;
-                max-width: 300px;
+                max-width: 100%;
             }
-        }
 
-        /* Enhanced focus styles for accessibility */
-        .btn:focus,
-        .form-control:focus {
-            outline: 2px solid #667eea;
-            outline-offset: 2px;
-        }
+            .message { max-width: 85%; }
 
-        /* Smooth transitions */
-        * {
-            transition: all 0.2s ease;
+            .file-input-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="file"] {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Decorative floating elements -->
-    <div class="floating-shape">
-        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="40" fill="currentColor"/>
-        </svg>
-    </div>
-    <div class="floating-shape">
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect x="20" y="20" width="40" height="40" fill="currentColor" rx="8"/>
-        </svg>
-    </div>
 
-    <div class="container">
-        <h2>🤖 Chat with AI</h2>
-        
+<div class="container">
+    <div class="main-card">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div class="title-accent"></div>
+            <h2>🤖 Chat with AI</h2>
+        </div>
+        <p class="subtitle">
+            Ask your doubts anytime. You can also upload your notes (PDF / TXT / MD),
+            and the AI will try to use them to answer.
+        </p>
+
+        <!-- System Messages -->
+        {% if last_error %}
+            <div class="system-msg error">{{ last_error }}</div>
+        {% endif %}
+        {% if last_info %}
+            <div class="system-msg info">{{ last_info }}</div>
+        {% endif %}
+
+        <!-- Chat History -->
+        <div class="chat-wrapper">
+            <div class="chat-box" id="chatBox">
+                {% if history and history|length > 0 %}
+                    {% for msg in history %}
+                        <div class="message-row">
+                            <div class="message {{ 'user-msg' if msg.role == 'user' else 'assistant-msg' }}">
+                                <div>{{ msg.message }}</div>
+                                <div class="meta">
+                                    {{ 'You' if msg.role == 'user' else 'AI' }}
+                                    &middot;
+                                    {{ msg.created_at }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No messages yet. Start the conversation below!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Chat Form -->
         <form method="POST" id="chatForm">
             <div class="form-group">
-                <label for="message" class="form-label">Your Message:</label>
-                <textarea 
-                    name="message" 
-                    id="message" 
-                    class="form-control" 
-                    rows="5" 
-                    required 
+                <label for="message" class="form-label">Your Message</label>
+                <textarea
+                    name="message"
+                    id="message"
+                    class="form-control"
+                    required
                     placeholder="Type your question or message here..."
                 ></textarea>
             </div>
-            <button type="submit" class="btn btn-primary" id="sendBtn">
-                <span id="btnText">Send Message</span>
-                <span id="loadingText" style="display: none;">Sending...</span>
+            <button type="submit" class="btn btn-primary" id="sendBtn" name="send_btn">
+                <span id="btnText">💬 Send Message</span>
+                <span id="loadingText" style="display: none;">⏳ Sending...</span>
             </button>
         </form>
 
-        {% if response %}
-        <div class="response-container">
-            <div class="response-label">
-                🤖 AI Assistant:
+        <!-- Upload Notes Form -->
+        <form method="POST" enctype="multipart/form-data" style="margin-top: 20px;">
+            <div class="form-group">
+                <label class="form-label">Upload Notes (PDF / TXT / MD)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" name="file" accept=".pdf,.txt,.md">
+                    <button type="submit" class="btn btn-secondary" name="upload_btn">
+                        📄 Upload Notes
+                    </button>
+                </div>
             </div>
-            <div class="response-text">
-                {{ response }}
-            </div>
-        </div>
-        {% endif %}
+        </form>
 
+        <!-- Back Button -->
         <div class="button-group">
             <a href="{{ url_for('student_dashboard') }}" class="btn btn-secondary">
                 ⬅ Back to Dashboard
             </a>
         </div>
+
     </div>
+</div>
 
-    <script>
-        // Form submission handling with loading state
-        document.getElementById('chatForm').addEventListener('submit', function(e) {
-            const sendBtn = document.getElementById('sendBtn');
-            const btnText = document.getElementById('btnText');
-            const loadingText = document.getElementById('loadingText');
-            
-            sendBtn.disabled = true;
-            btnText.style.display = 'none';
-            loadingText.style.display = 'inline';
-            
-            // Re-enable after form submission (in case of errors)
-            setTimeout(() => {
-                sendBtn.disabled = false;
-                btnText.style.display = 'inline';
-                loadingText.style.display = 'none';
-            }, 5000);
-        });
+<script>
+    // Auto-scroll chat to bottom on load
+    window.addEventListener('load', function () {
+        const chatBox = document.getElementById('chatBox');
+        if (chatBox) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
-        // Auto-resize textarea
         const textarea = document.getElementById('message');
-        textarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-        });
-
-        // Focus on textarea when page loads
-        window.addEventListener('load', function() {
+        if (textarea) {
             textarea.focus();
-        });
-    </script>
+            textarea.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+            });
+        }
+    });
+
+    // Form submission loading state
+    const chatForm = document.getElementById('chatForm');
+    chatForm.addEventListener('submit', function () {
+        const sendBtn = document.getElementById('sendBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingText = document.getElementById('loadingText');
+
+        sendBtn.disabled = true;
+        btnText.style.display = 'none';
+        loadingText.style.display = 'inline';
+    });
+</script>
 </body>
 </html>

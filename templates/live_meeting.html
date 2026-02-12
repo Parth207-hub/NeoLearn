@@ -21,7 +21,7 @@
     <div class="mt-4 p-3 border rounded">
       <h4>📋 Rate This Session</h4>
       <form method="POST" action="/feedback">
-        {{ csrf_token() }}
+       
         <input type="hidden" name="name" value="{{ user }}">
         <label for="rating">Rating (1–5):</label>
         <select name="rating" class="form-select my-2" required>
