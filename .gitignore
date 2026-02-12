@@ -2,9 +2,7 @@
 # Python Cache
 # ==============================
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 *.log
 
 # ==============================
@@ -15,25 +13,37 @@ env/
 .venv/
 
 # ==============================
-# Environment Variables (IMPORTANT 🔒)
+# Environment Variables 🔒
 # ==============================
 .env
 
 # ==============================
-# Database Files
+# Database / MySQL Data (VERY IMPORTANT)
 # ==============================
+data/
 *.db
 *.sqlite3
+*.ibd
+*.frm
 
 # ==============================
-# Uploads / User Files (NeoLearn)
+# Uploads / User Files (NeoLearn Runtime)
 # ==============================
 uploads/
 static/uploads/
 media/
 
 # ==============================
-# AI / Model Files (Large Files)
+# Large Media Files
+# ==============================
+*.mp4
+*.m4v
+*.mov
+*.avi
+*.pdf
+
+# ==============================
+# AI Models
 # ==============================
 models/
 *.gguf
@@ -41,7 +51,13 @@ models/
 *.pt
 
 # ==============================
-# VS Code Settings
+# Flask Instance
+# ==============================
+instance/
+.flaskenv
+
+# ==============================
+# VS Code
 # ==============================
 .vscode/
 
@@ -52,13 +68,6 @@ models/
 Thumbs.db
 
 # ==============================
-# Flask Cache / Sessions
-# ==============================
-instance/
-.flaskenv
-
-# ==============================
-# Jupyter / Data Files (if used)
+# Jupyter
 # ==============================
 .ipynb_checkpoints/
-*.mp4
