@@ -1002,11 +1002,24 @@
     <td>{{ m.title }}</td>
     <td>PDF</td>
     <td>
-        <button class="btn btn-primary"
-                onclick="openMaterial('{{ m.filename }}')">
-            👁️ View
-        </button>
-    </td>
+
+    <a href="{{ url_for('edit_material', id=m.id) }}"
+       class="btn btn-warning">
+        ✏️ Edit
+    </a>
+
+    <a href="{{ url_for('delete_material', id=m.id) }}"
+       class="btn btn-danger"
+       onclick="return confirm('Delete this material?')">
+        🗑 Delete
+    </a>
+
+    <button class="btn btn-primary"
+            onclick="openMaterial('{{ m.filename }}')">
+        👁️ View
+    </button>
+
+</td>
 </tr>
 {% endfor %}
 </tbody>

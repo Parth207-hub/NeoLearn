@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -198,7 +198,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #0B1D35, #1A3250);
             color: white;
             border: 2px solid transparent;
         }
@@ -235,7 +235,7 @@
             left: 20px;
             right: 20px;
             height: 2px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #0B1D35, #1A3250);
             transform: scaleX(0);
             transition: transform 0.3s ease;
             border-radius: 1px;
@@ -312,14 +312,14 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #0B1D35, #1A3250);
             border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <!-- Floating Background Elements -->
-    <div class="floating-shape">
+    <!-- <div class="floating-shape">
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
             <circle cx="50" cy="50" r="40" fill="white" opacity="0.1"/>
         </svg>
@@ -395,5 +395,228 @@
             document.querySelector('.edit-container').style.animation = 'slideIn 0.8s ease-out';
         });
     </script>
+</body> -->
+<!-- </html> --> -->
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Material - NeoLearn</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+/* ===== Background same as dashboard ===== */
+body{
+background:linear-gradient(135deg,#0B1D35 0%,#1A3250 50%,#2A4A6B 100%);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+padding:120px 20px 40px;
+color:#2d3748;
+}
+
+/* ===== Header ===== */
+.top-header{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+background:linear-gradient(135deg,#0B1D35,#1A3250);
+padding:14px 30px;
+box-shadow:0 4px 20px rgba(0,0,0,0.25);
+z-index:1000;
+}
+
+.top-header-inner{
+max-width:1200px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.header-title{
+font-family:'Crimson Pro',serif;
+font-size:1.5rem;
+font-weight:700;
+background:linear-gradient(135deg,#C8A062,#E6D5B8);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.header-back{
+text-decoration:none;
+background:linear-gradient(135deg,#C8A062,#9B7E4F);
+color:white;
+padding:8px 16px;
+border-radius:8px;
+font-weight:600;
+transition:0.3s;
+}
+
+.header-back:hover{
+transform:translateY(-2px);
+box-shadow:0 6px 18px rgba(200,160,98,0.35);
+}
+
+/* ===== Edit Card ===== */
+.edit-container{
+background:rgba(250,247,240,0.96);
+backdrop-filter:blur(20px);
+border-radius:16px;
+padding:45px 40px;
+max-width:520px;
+width:100%;
+box-shadow:0 20px 45px rgba(0,0,0,0.2);
+animation:fadeUp .5s ease;
+}
+
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(40px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+h2{
+text-align:center;
+font-size:2rem;
+margin-bottom:25px;
+font-family:'Crimson Pro',serif;
+background:linear-gradient(135deg,#C8A062,#E6D5B8);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+/* ===== Inputs ===== */
+.form-group{
+margin-bottom:18px;
+}
+
+label{
+font-weight:600;
+font-size:.95rem;
+margin-bottom:6px;
+display:block;
+}
+
+.form-control{
+width:100%;
+padding:14px 16px;
+border-radius:10px;
+border:2px solid rgba(200,160,98,.25);
+background:rgba(250,247,240,.8);
+font-size:0.95rem;
+transition:.3s;
+}
+
+.form-control:focus{
+outline:none;
+border-color:#C8A062;
+box-shadow:0 0 0 3px rgba(200,160,98,.2);
+background:white;
+}
+
+/* ===== Buttons ===== */
+.button-group{
+display:flex;
+gap:12px;
+margin-top:25px;
+}
+
+.btn{
+flex:1;
+padding:14px;
+border:none;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+text-decoration:none;
+text-align:center;
+transition:.3s;
+}
+
+.btn-primary{
+background:linear-gradient(135deg,#0B1D35,#1A3250);
+color:white;
+}
+
+.btn-primary:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+
+.btn-secondary{
+background:linear-gradient(135deg,#C8A062,#9B7E4F);
+color:white;
+}
+
+.btn-secondary:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 25px rgba(200,160,98,.4);
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- ===== NeoLearn Header ===== -->
+
+<div class="top-header">
+<div class="top-header-inner">
+<h1 class="header-title">NeoLearn</h1>
+
+<a href="{{ url_for('teacher_dashboard') }}" class="header-back">
+⬅ Back to Dashboard
+</a>
+</div>
+</div>
+
+<div class="edit-container">
+<h2>✏️ Edit Material</h2>
+
+<form method="post">
+
+<div class="form-group">
+<label>📚 Material Title</label>
+<input type="text" name="title" class="form-control"
+value="{{ material[1] }}" required>
+</div>
+
+<div class="form-group">
+<label>🎓 Standard</label>
+<input type="text" name="standard" class="form-control"
+value="{{ material[2] }}" required>
+</div>
+
+<div class="form-group">
+<label>📖 Subject</label>
+<input type="text" name="subject" class="form-control"
+value="{{ material[3] }}" required>
+</div>
+
+<div class="button-group">
+<button type="submit" class="btn btn-primary">
+💾 Update Material
+</button>
+
+<a href="{{ url_for('teacher_dashboard') }}" class="btn btn-secondary">
+Cancel
+</a>
+</div>
+
+</form>
+</div>
+
 </body>
 </html>

@@ -121,3 +121,67 @@ CREATE TABLE student_teacher_messages (
 
 ALTER TABLE messages
 MODIFY recipient VARCHAR(50) NOT NULL;
+
+CREATE TABLE events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100),
+    start_date DATE,
+    end_date DATE,
+    description TEXT
+);
+
+ALTER TABLE events
+ADD COLUMN audience ENUM('teacher','student','both') NOT NULL;
+
+CREATE TABLE admin_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE live_classes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    subject VARCHAR(100),
+    standard VARCHAR(50),
+    duration INT,
+    date DATETIME
+);
+
+INSERT INTO live_classes (subject, standard, duration, date)
+VALUES ('Mathematics - Algebra', '10', 45, '2026-01-10 14:00:00');
+
+CREATE TABLE quiz_results (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50),
+    quiz_title VARCHAR(100),
+    score INT,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE teacher_broadcasts (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    teacher_username VARCHAR(50) DEFAULT NULL,
+    standard VARCHAR(10) DEFAULT NULL,
+    message TEXT DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    PRIMARY KEY (id)
+
+)
+
+CREATE TABLE student_queries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_username VARCHAR(50) NOT NULL,
+    teacher_username VARCHAR(50) NOT NULL,
+    subject VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    reply TEXT,
+    status ENUM('open','replied') DEFAULT 'open',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+SELECT id, title, description, start_date, audience FROM events;
+ALTER TABLE events
+MODIFY description TEXT NOT NULL;
+UPDATE events
+SET description = 'No description provided'
+WHERE description IS NULL;
