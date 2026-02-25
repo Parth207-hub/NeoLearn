@@ -968,6 +968,138 @@
 .badge-teacher { background: #ede9fe; }
 .badge-all     { background: #dcfce7; }
 
+/* ===== Premium Student List ===== */
+
+.standard-heading{
+    font-weight:700;
+    margin-top:14px;
+    color:#1A3250;
+    font-size:1.1rem;
+}
+
+.student-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#FAF7F0;
+    padding:10px 14px;
+    border-radius:10px;
+    margin-top:6px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    transition:0.25s;
+}
+
+.student-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 14px rgba(0,0,0,0.15);
+}
+
+.student-name{
+    font-weight:600;
+    color:#0B1D35;
+}
+
+.standard-badge{
+    background:linear-gradient(135deg,#C8A062,#9B7E4F);
+    color:white;
+    padding:4px 10px;
+    border-radius:8px;
+    font-size:0.8rem;
+    font-weight:600;
+}
+      
+.premium-alert{
+    background:linear-gradient(135deg,#ffe6e6,#fff4f4);
+    border-left:5px solid #c0392b;
+    color:#8a1f1f;
+    padding:14px 18px;
+    border-radius:10px;
+    margin:14px;
+    font-weight:600;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    animation:fadeSlide .4s ease;
+}
+
+.alert-close{
+    background:none;
+    border:none;
+    font-size:16px;
+    cursor:pointer;
+    color:#8a1f1f;
+    font-weight:bold;
+}
+
+@keyframes fadeSlide{
+    from{opacity:0;transform:translateY(-10px);}
+    to{opacity:1;transform:translateY(0);}
+}
+/* ===== Live Validation UX ===== */
+
+.input-error{
+    border:2px solid #c0392b !important;
+    background:#fff6f6;
+}
+
+.strength-bar{
+    height:6px;
+    border-radius:6px;
+    margin-top:6px;
+    background:#ddd;
+    transition:0.3s;
+}
+
+.premium-alert{
+    padding:14px;
+    border-radius:10px;
+    margin:14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:600;
+    animation:fadeSlide .4s ease;
+}
+
+.premium-alert.success{
+    background:#e9f9ee;
+    border-left:5px solid #27ae60;
+    color:#1e7e34;
+}
+
+.premium-alert.error{
+    background:#ffe6e6;
+    border-left:5px solid #c0392b;
+    color:#8a1f1f;
+}
+
+@keyframes fadeSlide{
+    from{opacity:0;transform:translateY(-10px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+.strength-bar{
+    height:6px;
+    border-radius:6px;
+    margin-top:6px;
+    background:#ddd;
+}
+
+.input-wrapper{
+    position:relative;
+}
+
+.valid-icon{
+    position:absolute;
+    right:12px;
+    top:38px;
+    color:#27ae60;
+    display:none;
+    font-weight:bold;
+}
+.input-error{
+    border:2px solid #c0392b !important;
+}
     </style>
 </head>
 <body>
@@ -1053,12 +1185,12 @@
         <!-- Overview Section -->
         <div class="content-section active" id="overview">
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card" onclick="showList('teachers')" style="cursor:pointer;">
                     <div class="stat-icon">👨‍🏫</div>
                     <div class="stat-value">{{ teachers|length }}</div>
                     <div class="stat-label">Total Teachers</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="showList('students')" style="cursor:pointer;">
                     <div class="stat-icon">👨‍🎓</div>
                     <div class="stat-value">{{ students|length }}</div>
                     <div class="stat-label">Total Students</div>
@@ -1175,48 +1307,94 @@
         </div>
 
         <!-- Register User Section -->
-        <div class="content-section" id="register">
-            <div class="card">
-                <div class="card-header">➕ Register New User</div>
-                <form method="POST" action="{{ url_for('admin_register') }}">
-                    <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Enter password" required>
-                    </div>
-                    <div class="form-group">
-    <label class="form-label">Email</label>
-    <input type="email" name="email" class="form-control" placeholder="Enter email" required>
-</div>
+      <div class="content-section" id="register">
+    <div class="card">
+        <div class="card-header">➕ Register New User</div>
 
-<div class="form-group">
-    <label class="form-label">Mobile</label>
-    <input type="text" name="mobile" class="form-control" placeholder="Enter mobile number" required>
-</div>
-
-<div class="form-group">
-    <label class="form-label">Date of Birth</label>
-    <input type="date" name="dob" class="form-control" required>
-</div>
-
-                    <div class="form-group">
-                        <label class="form-label">Role</label>
-                        <select name="role" class="form-select" id="roleSelect" required>
-                            <option value="teacher">👨‍🏫 Teacher</option>
-                            <option value="student">👨‍🎓 Student</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="standardField" style="display:none;">
-                        <label class="form-label">Standard</label>
-                        <input type="text" name="standard" class="form-control" placeholder="Enter standard">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Register User</button>
-                </form>
-            </div>
+        <!-- ===== PREMIUM FLASH MESSAGE ===== -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category,msg in messages %}
+        <div class="premium-alert {{category}}" id="alertBox">
+            <span>{{ msg }}</span>
+            <button onclick="closeAlert()">✖</button>
         </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('admin_register') }}">
+
+            <!-- USERNAME -->
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <label class="form-label">Password</label>
+
+                <div style="position:relative;">
+                    <input type="password" name="password" id="passwordInput"
+                           class="form-control" required>
+
+                    <span onclick="togglePassword()" style="
+                    position:absolute;
+                    right:12px;
+                    top:50%;
+                    transform:translateY(-50%);
+                    cursor:pointer;">👁</span>
+                </div>
+
+                <div id="strengthBar" class="strength-bar"></div>
+                <small id="strengthText"></small>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="form-group input-wrapper">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" id="emailInput"
+                    class="form-control" placeholder="Enter email" required>
+                <span class="valid-icon" id="emailValid">✔</span>
+            </div>
+
+            <!-- MOBILE -->
+            <div class="form-group">
+                <label class="form-label">Mobile</label>
+                <input type="text" name="mobile" id="mobileInput"
+                    class="form-control" placeholder="Enter mobile number" required>
+            </div>
+
+            <!-- DOB -->
+            <div class="form-group">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" name="dob" class="form-control" required>
+            </div>
+
+            <!-- ROLE -->
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <select name="role" class="form-select" id="roleSelect" required>
+                    <option value="teacher">👨‍🏫 Teacher</option>
+                    <option value="student">👨‍🎓 Student</option>
+                </select>
+            </div>
+
+            <!-- STANDARD -->
+            <div class="form-group" id="standardField" style="display:none;">
+                <label class="form-label">Standard</label>
+                <input type="text" name="standard" class="form-control">
+            </div>
+
+           <button type="submit" id="registerBtn"
+           class="btn btn-primary w-100">
+           Register User
+           </button>
+
+        </form>
+    </div>
+</div>
 
         <!-- Send Message Section -->
         <div class="content-section" id="message">
@@ -1443,7 +1621,7 @@
             observer.observe(section, { attributes: true, attributeFilter: ['class'] });
         });
     </script>
-    <script>
+<script>
 function filterMessages(type) {
     const items = document.querySelectorAll('.message-item');
 
@@ -1456,7 +1634,270 @@ function filterMessages(type) {
         }
     });
 }
+
 </script>
+<script>
+function showList(type){
+
+    let url = type === 'teachers'
+        ? "/admin/teachers"
+        : "/admin/students";
+
+    fetch(url)
+    .then(res => res.json())
+    .then(data => {
+
+        const list = document.getElementById("listContent");
+        const title = document.getElementById("listTitle");
+
+        list.innerHTML = "";
+
+        title.innerText =
+            type === 'teachers' ? "👨‍🏫 Teacher List" : "🎓 Student List";
+
+     list.innerHTML = "";
+
+if(type === "students"){
+
+    let currentStandard = null;
+
+    data.forEach(item=>{
+
+        // create heading when standard changes
+        if(currentStandard !== item.standard){
+
+            currentStandard = item.standard;
+
+            const heading = document.createElement("div");
+            heading.className = "standard-heading";
+            heading.innerText = "📚 Standard " + currentStandard;
+            list.appendChild(heading);
+        }
+
+        // create premium card
+        const card = document.createElement("div");
+        card.className = "student-card";
+
+        card.innerHTML = `
+            <div class="student-name">👤 ${item.username}</div>
+            <div class="standard-badge">Std ${item.standard}</div>
+        `;
+
+        list.appendChild(card);
+    });
+
+}else{
+
+    data.forEach(item=>{
+        const li = document.createElement("li");
+        li.innerText = item.username;
+        list.appendChild(li);
+    });
+
+}
+
+        document.getElementById("listModal").style.display="block";
+    });
+}
+
+function closeList(){
+    document.getElementById("listModal").style.display="none";
+}
+</script>
+
+<script>
+function closeAlert(){
+    document.getElementById("alertBox").style.display="none";
+}
+</script>
+
+<script>
+
+/* ⭐ GLOBAL PASSWORD TOGGLE (must be outside DOMContentLoaded) */
+function togglePassword(){
+    const input = document.getElementById("passwordInput");
+    if(!input) return;
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const passwordInput = document.getElementById("passwordInput");
+const emailInput = document.getElementById("emailInput");
+const mobileInput = document.getElementById("mobileInput");
+const registerBtn = document.getElementById("registerBtn");
+const bar = document.getElementById("strengthBar");
+const text = document.getElementById("strengthText");
+
+/* ===========================
+   🔐 PASSWORD STRENGTH CHECK
+=========================== */
+if(passwordInput){
+passwordInput.addEventListener("input",function(){
+
+    const val = this.value;
+    let score = 0;
+
+    if(val.length >= 8) score++;
+    if(/[A-Z]/.test(val)) score++;
+    if(/[a-z]/.test(val)) score++;
+    if(/\d/.test(val)) score++;
+    if(/[@$!%*?&]/.test(val)) score++;
+
+    if(score <= 2){
+        bar.style.background = "#e74c3c";
+        bar.style.width = "30%";
+        text.innerText = "Weak password";
+    }
+    else if(score <=4){
+        bar.style.background = "#f39c12";
+        bar.style.width = "65%";
+        text.innerText = "Medium strength";
+    }
+    else{
+        bar.style.background = "#27ae60";
+        bar.style.width = "100%";
+        text.innerText = "Strong password";
+    }
+
+    validateForm();
+});
+}
+
+/* ===========================
+   📧 EMAIL VALIDATION LIVE
+=========================== */
+if(emailInput){
+emailInput.addEventListener("input",function(){
+
+    const emailPattern = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+
+    if(!emailPattern.test(this.value)){
+        this.classList.add("input-error");
+    }else{
+        this.classList.remove("input-error");
+    }
+
+    validateForm();
+});
+}
+
+/* ===========================
+   📱 MOBILE VALIDATION LIVE
+=========================== */
+if(mobileInput){
+mobileInput.addEventListener("input",function(){
+
+    this.value = this.value.replace(/\D/g,'').slice(0,10);
+
+    if(this.value.length !== 10){
+        this.classList.add("input-error");
+    }else{
+        this.classList.remove("input-error");
+    }
+
+    validateForm();
+});
+}
+
+/* ===========================
+   ⭐ MAIN PRO VALIDATION SYSTEM
+=========================== */
+function validateForm(){
+
+    if(!emailInput || !mobileInput || !passwordInput || !registerBtn) return;
+
+    const emailOk = /^[\w\.-]+@[\w\.-]+\.\w+$/.test(emailInput.value);
+    const mobileOk = /^\d{10}$/.test(mobileInput.value);
+    const passwordOk = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(passwordInput.value);
+
+    if(emailOk && mobileOk && passwordOk){
+        registerBtn.disabled = false;
+        registerBtn.style.opacity = "1";
+    }else{
+        registerBtn.disabled = true;
+        registerBtn.style.opacity = "0.6";
+    }
+}
+
+/* ===========================
+   ❌ CLOSE FLASH ALERT
+=========================== */
+window.closeAlert = function(){
+    const alertBox = document.getElementById("alertBox");
+    if(alertBox){
+        alertBox.style.display="none";
+    }
+}
+
+});
+</script>
+
+<!-- ===== Teacher/Student List Modal ===== -->
+<div id="listModal" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+z-index:9999;">
+
+<div style="
+width:420px;
+margin:120px auto;
+background:#FAF7F0;
+border-radius:12px;
+padding:20px;
+max-height:70vh;
+overflow:auto;">
+
+<h3 id="listTitle">List</h3>
+<ul id="listContent" style="margin-top:15px;"></ul>
+
+<button onclick="closeList()" class="btn btn-danger"
+style="margin-top:15px;">Close</button>
+
+</div>
+</div>
+    // <!-- Existing scripts above -->
+
+// <script>
+// document.addEventListener("DOMContentLoaded", function(){
+
+//     const emailInput = document.getElementById("emailInput");
+//     const mobileInput = document.getElementById("mobileInput")
+//     const passwordInput = document.getElementById("passwordInput");
+//     const registerBtn = document.getElementById("registerBtn");
+
+//     function validateForm(){
+
+//         const emailOk = /^[\w\.-]+@[\w\.-]+\.\w+$/.test(emailInput.value);
+//         const mobileOk = /^\d{10}$/.test(mobileInput.value);
+//         const passwordOk = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(passwordInput.value);
+
+//         document.getElementById("emailValid").style.display = emailOk ? "block":"none";
+
+//         if(emailOk && mobileOk && passwordOk){
+//             registerBtn.disabled=false;
+//             registerBtn.style.opacity="1";
+//         }else{
+//             registerBtn.disabled=true;
+//             registerBtn.style.opacity="0.6";
+//         }
+//     }
+
+//     emailInput.addEventListener("input",validateForm);
+//     mobileInput.addEventListener("input",validateForm);
+//     passwordInput.addEventListener("input",validateForm);
+
+//     function closeAlert(){
+//         document.getElementById("alertBox").style.display="none";
+//     }
+
+// });
+// </script>
 
 </body>
 </html>

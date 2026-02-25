@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import mysql.connector, os
@@ -235,45 +235,96 @@ def create_event():
     return redirect(url_for('admin_dashboard'))
 
 
+import re
+from flask import flash, redirect, url_for, request, session
+from werkzeug.security import generate_password_hash
+
 @app.route('/admin/register', methods=['POST'])
 def admin_register():
+
     if not session.get('admin'):
         return redirect(url_for('login'))
 
-    username = request.form['username']
-    password = generate_password_hash(request.form['password'])
+    username = request.form['username'].strip()
+    raw_password = request.form['password']
     role = request.form['role']
-    standard = request.form.get('standard') if role == 'student' else None
-    email = request.form['email']
-    mobile = request.form['mobile']
+    email = request.form['email'].strip()
+    mobile = request.form['mobile'].strip()
     dob = request.form['dob']
+    standard = request.form.get('standard') if role == 'student' else None
+
+    # ===============================
+    # ✅ REQUIRED FIELD VALIDATION
+    # ===============================
+    if not username or not raw_password or not email or not mobile or not dob:
+        flash("All fields are required.")
+        return redirect(url_for('admin_dashboard'))
+
+    # ===============================
+    # ✅ USERNAME VALIDATION
+    # ===============================
+    if len(username) < 3:
+        flash("Username must be at least 3 characters.")
+        return redirect(url_for('admin_dashboard'))
+
+    # ===============================
+    # ✅ PASSWORD VALIDATION
+    # 8+ chars, upper, lower, number, special
+    # ===============================
+    password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$'
+
+    if not re.match(password_pattern, raw_password):
+        flash("Password must be 8+ chars with Uppercase, Lowercase, Number & Special Character.")
+        return redirect(url_for('admin_dashboard'))
+
+    # ===============================
+    # ✅ EMAIL VALIDATION
+    # ===============================
+    email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+    if not re.match(email_pattern, email):
+        flash("Invalid email format.")
+        return redirect(url_for('admin_dashboard'))
+
+    # ===============================
+    # ✅ MOBILE VALIDATION (10 DIGITS)
+    # ===============================
+    if not mobile.isdigit() or len(mobile) != 10:
+        flash("Mobile must be 10 digits.","error")
+        return redirect(url_for('admin_dashboard'))
+
+    # ===============================
+    # ✅ STUDENT STANDARD CHECK
+    # ===============================
+    if role == 'student' and not standard:
+        flash("Student must have a standard.")
+        return redirect(url_for('admin_dashboard'))
+
+    # ===============================
+    # ✅ HASH PASSWORD AFTER VALIDATION
+    # ===============================
+    password = generate_password_hash(raw_password)
 
     con = get_db_connection()
     cur = con.cursor()
 
-    # Check duplicate username
-    cur.execute("SELECT id FROM users WHERE username = %s", (username,))
+    # Duplicate username check
+    cur.execute("SELECT id FROM users WHERE username=%s",(username,))
     if cur.fetchone():
         flash("Username already exists.")
         con.close()
         return redirect(url_for('admin_dashboard'))
 
     # Insert user
-    cur.execute(
-    """
-    INSERT INTO users (username, password, role, standard, email, mobile, dob)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """,
-    (username, password, role, standard, email, mobile, dob)
-)
-
+    cur.execute("""
+        INSERT INTO users (username,password,role,standard,email,mobile,dob)
+        VALUES (%s,%s,%s,%s,%s,%s,%s)
+    """,(username,password,role,standard,email,mobile,dob))
 
     con.commit()
     con.close()
-
-    flash("User registered successfully.")
+    flash("🎉 User registered successfully!","success")
     return redirect(url_for('admin_dashboard'))
-
 
 @app.route('/admin/message', methods=['GET', 'POST'])
 def admin_message():
@@ -625,6 +676,43 @@ def student_chat():
         last_error=last_error,
         last_info=last_info
     )
+
+@app.route('/admin/teachers')
+def admin_teachers():
+
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor(dictionary=True)
+
+    cur.execute("SELECT username FROM users WHERE role='teacher'")
+    teachers = cur.fetchall()
+
+    con.close()
+    return jsonify(teachers)
+
+
+@app.route('/admin/students')
+def admin_students():
+
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    cur = con.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT username, standard
+        FROM users
+        WHERE role='student'
+        ORDER BY CAST(standard AS UNSIGNED)
+        """)
+    students = cur.fetchall()
+
+    con.close()
+    return jsonify(students)
+
 
 @app.route('/teacher', methods=['GET', 'POST'])
 def teacher_dashboard():
